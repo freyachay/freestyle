@@ -43,10 +43,17 @@ gramDict = create_dict(grams, n)
 prevChunk = random.choice(gramDict.keys())
 sentence = [prevChunk[i] for i in range(n-1)]
 
-for i in range(20):
+currentLength = 0
+targetLength = random.randrange(5, 12)
+for i in range(100):
 	nextWord = generate_word(prevChunk, gramDict, contents.split())
 	sentence.append(nextWord)
+	currentLength += 1
 	prevChunk = prevChunk[1:] + (nextWord,)
+	if currentLength is targetLength:
+		sentence.append("\n")
+		targetLength = random.randrange(5, 12)
+		currentLength = 0
 print(' '.join(sentence))
 	
 	
