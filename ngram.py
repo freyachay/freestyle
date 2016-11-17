@@ -20,27 +20,31 @@ def create_dict(grams, n):
 		for i in range(n-1):
 			key = key + (words[i],)
 
-		print(key)
 		gramDict[key].append(words[n-1])
-		print(words[n-1])
 	return gramDict
 
-def generate_word(key, gramDict):
+def generate_word(key, gramDict, words):
+	if len(gramDict[key]) is 0:
+		return random.choice(words)
+
 	return random.choice(gramDict[key])
 
 n = 3
-grams = generate_grams('one two three four the water bottle give me the water bottle'.split(' '), n)
+sampleString = 'one two three four the water bottle give me the water bottle'
+
+f = open('chanceLyrics.txt')
+contents = f.read()
+
+grams = generate_grams(contents.split(' '), n)
 freqTable = Counter(grams)
-print(freqTable)
 
 gramDict = create_dict(grams, n)
-print(gramDict)
 
 prevChunk = random.choice(gramDict.keys())
 sentence = [prevChunk[i] for i in range(n-1)]
 
-for i in range(5):
-	nextWord = generate_word(prevChunk, gramDict)
+for i in range(20):
+	nextWord = generate_word(prevChunk, gramDict, contents.split())
 	sentence.append(nextWord)
 	prevChunk = prevChunk[1:] + (nextWord,)
 print(' '.join(sentence))
