@@ -1,11 +1,13 @@
 import nltk
 from nltk.util import ngrams
+from collections import Counter
 
-def word_grams(words):
-    s = []
+def word_grams(words, n):
+    gramList = []
     
-    for ngram in ngrams(words, 3):
-        s.append(' '.join(str(i) for i in ngram))
-    return s
+    for ngram in ngrams(words, n):
+        gramList.append(' '.join(str(i) for i in ngram))
+    return gramList
 
-print word_grams('one two three four water bottle give me the water'.split(' '))
+bigrams = word_grams('one two three four water bottle give me the water bottle'.split(' '), 2)
+print(Counter(bigrams))
