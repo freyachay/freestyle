@@ -29,9 +29,7 @@ def generate_word(key, gramDict, words):
 
 	return random.choice(gramDict[key])
 
-n = 3
-sampleString = 'one two three four the water bottle give me the water bottle'
-
+n = 2
 f = open('chanceLyrics.txt')
 contents = f.read()
 
