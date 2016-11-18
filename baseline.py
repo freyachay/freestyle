@@ -25,8 +25,8 @@ def create_dict(grams, n):
 
 def generate_word(key, gramDict, words):
 	if len(gramDict[key]) is 0:
-		return random.choice(words)
-
+		return ""
+		#return random.choice(words)
 	return random.choice(gramDict[key])
 
 n = 2
@@ -45,6 +45,9 @@ currentLength = 0
 targetLength = random.randrange(5, 12)
 for i in range(100):
 	nextWord = generate_word(prevChunk, gramDict, contents.split())
+	while(nextWord is ""):
+		nextWord = generate_word(random.choice(gramDict.keys()), gramDict, contents.split())
+	
 	sentence.append(nextWord)
 	currentLength += 1
 	prevChunk = prevChunk[1:] + (nextWord,)
@@ -52,6 +55,6 @@ for i in range(100):
 		sentence.append("\n")
 		targetLength = random.randrange(5, 12)
 		currentLength = 0
-print(' '.join(sentence))
+print(' '.join(sentence).lower())
 	
 	
