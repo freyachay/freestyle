@@ -15,7 +15,10 @@ n = 2
 phrase_len = 2
 
 # These will be populated after running
-rhymeDist = defaultdict(lambda: defaultdict(float))
+def dd():
+	return defaultdict(float)
+
+rhymeDist = defaultdict(dd)
 lineLenDist = defaultdict(float)
 gramDict = defaultdict(list)
 
@@ -210,9 +213,11 @@ normalizeLineDist(lineCount)
 normalizeRhymeDist(phraseCount)
 
 # Write model to file (rhymeDist, lineLenDist, gramDict)
-#pickle.dump(rhymeDist, open("rhymeDist.p", "wb"))
+pickle.dump(rhymeDist, open("rhymeDist.p", "wb"))
 pickle.dump(lineLenDist, open("lineLenDist.p", "wb"))
 pickle.dump(gramDict, open("gramDict.p", "wb"))
+print(rhymeDist)
+print(lineLenDist)
 print(gramDict)
 
 
