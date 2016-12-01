@@ -10,6 +10,20 @@ extraDict = fmdict.extraDict
 
 phrase_len = 2
 
+# Takes in a word. Looks it up in either extraDict or mainDict and returns list of pronunciations
+# (list of lists of sounds)
+def getPron(word):
+	# Check fm dict
+	if word.lower() in extraDict.keys():
+		return [extraDict[word.lower()]]
+	# Look in cmudict
+	if word.lower() in mainDict.keys():
+		return mainDict[word.lower()]
+	return None
+
+def containsDigit(string):
+	return any(char.isdigit() for char in string)
+
 # This takes in a phrase (list of words) and returns a list of syllables made up of sounds.
 def getSyllables(phrase):
 	syllables = collections.defaultdict(list)
@@ -19,12 +33,11 @@ def getSyllables(phrase):
 	globalSylIndex = 0
 	localSylIndex = 0
 	for word in phrase:
-		for pronunciation in mainDict[word.lower()]:
+		for pronunciation in getPron(word):
 			localSylIndex = globalSylIndex	
 			for sound in pronunciation:
 				currentSyl.append(sound)
-
-				if (sound[-1]).isdigit():
+				if (containsDigit(sound)):
 					prev = syllables[localSylIndex]
 					if currentSyl not in prev:
 						prev.append(currentSyl)
@@ -35,68 +48,50 @@ def getSyllables(phrase):
 
 			if currentSyl is not []:
 				lastSyl = syllables[localSylIndex - 1]
-				lastPron = lastSyl[-1]
+				lastPron = lastSyl[len(lastSyl)-1]
 				for sound in currentSyl:
 					lastPron.append(sound)
 
 				if lastPron not in lastSyl:
-					lastSyl[-1] = lastPron
+					lastSyl[len(lastSyl)-1] = lastPron
 					syllables[localSylIndex - 1] = lastSyl
 				currentSyl = []
 				
-		globalSylIndex = localSylIndex + 1
+		globalSylIndex = localSylIndex
 	return syllables
-
-print(getSyllables(["graduate", "water", "bottle", "chair"]))
 
 # def getRhymeScore(pron1, pron2):
 # 	return 1
 
-# def getPron(word):
-# 	# Check fm dict
-# 	if word.lower() in extraDict.keys():
-# 		return [extraDict[word.lower()]]
-# 	# Look in cmudict
-# 	if word.lower() in mainDict.keys():
-# 		return mainDict[word.lower()]
-# 	return None
 
-# def processPhrase(phrase):
-# 	tokens = wordpunct_tokenize(sentence)
-# 	punct = ['.', ',', '!', ':', ';']
-# 	words = [word for word in tokens if word not in punct]
 
-# 	# List of lists of possible pronunciations for each sound in phrase
-# 	phraseSounds = []
-
-# 	# For each word in phrase
-# 	for word in words:
-# 		pron = getPron(word)
-# 		if pron is None: continue
-# 		for soundIndex in range(len(pron[0])):
-# 			soundList = []
-# 			for p in pron:
-# 				sound = p[soundIndex]
-# 				if sound not in soundList:
-# 					soundList.append(sound)
-# 			phraseSounds.append(soundList)
+def processPhrase(phrase):
+	tokens = wordpunct_tokenize(phrase)
+	punct = ['.', ',', '!', ':', ';']
+	words = [word for word in tokens if word not in punct]
+	return words
 
 
 # 	for s in phraseSounds:
 # 		print s
+def updateRhymeDist(phraseSylDict):
+	for k, v in phraseSylDict.iteritems():
+		print("{}: {}").format(k, v)
+	print("\n")
 
 
+def processCorpus():
+	lines = sentence.splitlines()
+	phrase = ''
+	for i in range(len(lines)):
+		phrase = phrase + lines[i]
+		if ((i + 1) % phrase_len is 0):
+			print(processPhrase(phrase))
+			phraseSylDict = getSyllables(processPhrase(phrase))
+			updateRhymeDist(phraseSylDict)
+			phrase = ''
 
-# def processCorpus():
-# 	lines = sentence.splitlines()
-# 	phrase = ''
-# 	for i in range(len(lines)):
-# 		phrase = phrase + lines[i]
-# 		if ((i + 1) % phrase_len is 0):
-# 			processPhrase(phrase)
-# 			phrase = ''
-
-# processCorpus()
+processCorpus()
 
 # # Extract list of words
 
