@@ -4,7 +4,7 @@ from collections import defaultdict
 from nltk.corpus import cmudict
 from nltk.tokenize import word_tokenize, wordpunct_tokenize, sent_tokenize
 
-sentence = "The cat and the hat \n Water and otter like the bat \n Well \n Good"
+sentence = "Listen up people \n church and steeple \n I never ever pie \n Cause I'm a guy sky"
 mainDict = cmudict.dict()
 extraDict = fmdict.extraDict
 
@@ -74,7 +74,24 @@ def processPhrase(phrase):
 # Takes in 2 pronunciations of syllables (lists of sounds), returns 
 # whether or not they "rhyme" (are the same)
 def sylRhymes(syl1, syl2):
-	return syl1 == syl2
+	# Reject repetition
+	if (syl1 == syl2): return False
+
+	# Get stressed syllable and suffix from syl1
+	stressed1 = [s for s in syl1 if containsDigit(s)][0] # We know there will only be one stressed syl
+	stressIndex1 = syl1.index(stressed1)
+	suffix1 = syl1[stressIndex1 + 1:]
+
+	# Same for syl2
+	stressed2 = [s for s in syl2 if containsDigit(s)][0] # We know there will only be one stressed syl
+	stressIndex2 = syl2.index(stressed2)
+	suffix2 = syl2[stressIndex2 + 1:]
+
+	if (stressed1 == stressed2) and (suffix1 == suffix2):
+		print("{} rhymes with {}".format(syl1, syl2))
+	return (stressed1 == stressed2) and (suffix1 == suffix2)
+
+		
 
 def updateRhymeDistCounts(phraseSylDict):
 	for pos1, prons in phraseSylDict.iteritems():
