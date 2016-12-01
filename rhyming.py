@@ -1,14 +1,16 @@
 import nltk
 import fmdict
-import collections
+from collections import defaultdict
 from nltk.corpus import cmudict
 from nltk.tokenize import word_tokenize, wordpunct_tokenize, sent_tokenize
 
-sentence = "Unawareness I am sitting,\n at a table with!\n a water bottle \n Merrily we go gibberishhh"
+sentence = "The cat and the hat \n Water and otter like the bat \n Well \n Good"
 mainDict = cmudict.dict()
 extraDict = fmdict.extraDict
 
 phrase_len = 2
+
+rhymeDist = defaultdict(lambda: defaultdict(float))
 
 # Takes in a word. Looks it up in either extraDict or mainDict and returns list of pronunciations
 # (list of lists of sounds)
@@ -26,7 +28,7 @@ def containsDigit(string):
 
 # This takes in a phrase (list of words) and returns a list of syllables made up of sounds.
 def getSyllables(phrase):
-	syllables = collections.defaultdict(list)
+	syllables = defaultdict(list)
 	currentSyl = []
 
 	# For each pronunciation
@@ -69,22 +71,43 @@ def processPhrase(phrase):
 	words = [word for word in tokens if word not in punct]
 	return words
 
+# Takes in 2 pronunciations of syllables (lists of sounds), returns 
+# whether or not they "rhyme" (are the same)
+def sylRhymes(syl1, syl2):
+	return syl1 == syl2
 
-def updateRhymeDist(phraseSylDict):
-	for k, v in phraseSylDict.iteritems():
-		print("{}: {}").format(k, v)
-	print("\n")
+def updateRhymeDistCounts(phraseSylDict):
+	for pos1, prons in phraseSylDict.iteritems():
+		for pos2 in range(pos1):
+			found = False
+			prevProns = phraseSylDict[pos2]
+			for pron1 in prons:
+				for pron2 in prevProns:
+					if (sylRhymes(pron1, pron2)):
+						found = True
+						(rhymeDist[pos1])[pos2] += 1
+						break
+				if found: break
 
+def normalizeRhymeDist(phraseCount):
+	for pos, count in rhymeDist.iteritems():
+		for k, v in count.iteritems():
+			(rhymeDist[pos])[k] = v/phraseCount
 
 def processCorpus():
 	lines = sentence.splitlines()
 	phrase = ''
+	phraseCount = 0
 	for i in range(len(lines)):
 		phrase = phrase + lines[i]
 		if ((i + 1) % phrase_len is 0):
-			print(processPhrase(phrase))
+			phraseCount += 1
 			phraseSylDict = getSyllables(processPhrase(phrase))
-			updateRhymeDist(phraseSylDict)
+			updateRhymeDistCounts(phraseSylDict)
 			phrase = ''
+	print(rhymeDist)
+	normalizeRhymeDist(phraseCount)
+	print(rhymeDist)
+
 
 processCorpus()
