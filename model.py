@@ -17,7 +17,7 @@ boringWords = ["the","be","to","of","and","a","in","that","have", \
 				"their","what","so","who","if","them","yeah"]
 
 n = 2
-phrase_len = 2
+phraseLen = 2
 
 # These will be populated after running
 def dd():
@@ -197,33 +197,16 @@ def buildGramDict(contents):
 def buildRhymingDict(contents):
 	words = processPhrase(contents)
 	for word in words:
-		print(word)
 		if word in boringWords: continue
 		syllables = getSyllables([word])
 		for pron in syllables[0]:
-			print(pron)
 			key = ""
 			# Get stressed syllable and suffix from syl1
 			stressed = [s for s in pron if containsDigit(s)][0] # We know there will only be one stressed syl
 			stressIndex = pron.index(stressed)
 			suffix = pron[stressIndex + 1:]
 			key = stressed + ''.join(suffix)
-			print(key)
-			rhymingDictionary[key].add(word)
-			print("\n")
-
-
-	# words = processPhrase(contents)
-	# for i in range(len(words)):
-	# 	word1 = words[i]
-	# 	if word1 in boringWords: continue
-	# 	for j in range(i):
-	# 		word2 = words[j]
-	# 		if word2 in boringWords: continue
-	# 		if word1 == word2: continue
-	# 		if rhymesWith(word1, word2): 
-	# 			rhymingDictionary[word1].add(word2)
-	# 			rhymingDictionary[word2].add(word1)
+			rhymingDictionary[key].add(word.lower())
 
 
 # **********************************************
@@ -237,37 +220,34 @@ def buildRhymingDict(contents):
 f = open('chanceLyrics.txt')
 contents = f.read()
 
-# buildGramDict(sentence)
-buildRhymingDict(sentence)
-for k, v in rhymingDictionary.iteritems():
-	print("{}, {}".format(k, v))
+# Construct n-gram and rhyming dictionaries
+buildGramDict(contents)
+buildRhymingDict(contents)
 
-# lines = sentence.splitlines()
-# phrase = ''
-# lineCount = 0
-# phraseCount = 0
-# for i in range(len(lines)):
-# 	if lines[i] == '': continue
+# Build probability models
+lines = contents.splitlines()
+phrase = ''
+lineCount = 0
+phraseCount = 0
+for i in range(len(lines)):
+	if lines[i] == '': continue
 
-# 	lineCount += 1
-# 	updateLineDistCounts(lines[i])
-# 	phrase = phrase + " " + lines[i]
-# 	if ((i + 1) % phrase_len is 0):
-# 		phraseCount += 1
-# 		phraseSylDict = getSyllables(processPhrase(phrase))
-# 		updateRhymeDistCounts(phraseSylDict)
-# 		phrase = ''
-# normalizeLineDist(lineCount)
-# normalizeRhymeDist(phraseCount)
+	lineCount += 1
+	updateLineDistCounts(lines[i])
+	phrase = phrase + " " + lines[i]
+	if ((i + 1) % phraseLen is 0):
+		phraseCount += 1
+		phraseSylDict = getSyllables(processPhrase(phrase))
+		updateRhymeDistCounts(phraseSylDict)
+		phrase = ''
+normalizeLineDist(lineCount)
+normalizeRhymeDist(phraseCount)
 
-# # Write model to file (rhymeDist, lineLenDist, gramDict)
-# pickle.dump(rhymeDist, open("rhymeDist.p", "wb"))
-# pickle.dump(lineLenDist, open("lineLenDist.p", "wb"))
-# pickle.dump(gramDict, open("gramDict.p", "wb"))
-# print(rhymeDist)
-# print(lineLenDist)
-# print(gramDict)
-
+# Write model to file (rhymeDist, lineLenDist, gramDict, rhymingDictionary)
+pickle.dump(rhymeDist, open("rhymeDist.p", "wb"))
+pickle.dump(lineLenDist, open("lineLenDist.p", "wb"))
+pickle.dump(gramDict, open("gramDict.p", "wb"))
+pickle.dump(rhymingDictionary, open("rhymingDictionary.p", "wb"))
 
 
 
