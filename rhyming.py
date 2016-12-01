@@ -1,5 +1,6 @@
 import nltk
 import fmdict
+import pickle
 from collections import defaultdict
 from nltk.util import ngrams
 from nltk.corpus import cmudict
@@ -13,6 +14,7 @@ extraDict = fmdict.extraDict
 n = 2
 phrase_len = 2
 
+# These will be populated after running
 rhymeDist = defaultdict(lambda: defaultdict(float))
 lineLenDist = defaultdict(float)
 gramDict = defaultdict(list)
@@ -187,9 +189,9 @@ def buildGramDict(contents):
 f = open('chanceLyrics.txt')
 contents = f.read()
 
-buildGramDict(contents)
+buildGramDict(sentence)
 
-lines = contents.splitlines()
+lines = sentence.splitlines()
 phrase = ''
 lineCount = 0
 phraseCount = 0
@@ -207,7 +209,11 @@ for i in range(len(lines)):
 normalizeLineDist(lineCount)
 normalizeRhymeDist(phraseCount)
 
-
+# Write model to file (rhymeDist, lineLenDist, gramDict)
+#pickle.dump(rhymeDist, open("rhymeDist.p", "wb"))
+pickle.dump(lineLenDist, open("lineLenDist.p", "wb"))
+pickle.dump(gramDict, open("gramDict.p", "wb"))
+print(gramDict)
 
 
 
