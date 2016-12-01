@@ -38,8 +38,6 @@ def processPhrase(phrase):
 
 
 
-
-
 # ************* Rhyme distribution ************
 
 # Returns true of string contains a digit (useful for identifying stressed sounds)
