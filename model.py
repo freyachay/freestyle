@@ -7,9 +7,14 @@ from nltk.corpus import cmudict
 from nltk.tokenize import word_tokenize, wordpunct_tokenize, sent_tokenize, RegexpTokenizer
 
 # Global variables
-sentence = "Listen up people \n church and steeple \n I never ever pie \n Cause I a guy sky"
+sentence = "Hey there \n bear the be this care \n Yes \n I am a care bear mess all guy sky"
 mainDict = cmudict.dict()
 extraDict = fmdict.extraDict
+boringWords = ["the","be","to","of","and","a","in","that","have", \
+				"I","it","for","not","on","with","he","as","you","do", \
+				"at","this","but","his","by","from","they","we","say", \
+				"her","she","or","an","will","my","one","all","there", \
+				"their","what","so","who","if","them","yeah"]
 
 n = 2
 phrase_len = 2
@@ -21,6 +26,7 @@ def dd():
 rhymeDist = defaultdict(dd)
 lineLenDist = defaultdict(float)
 gramDict = defaultdict(list)
+rhymingDictionary = defaultdict(set)
 
 
 
@@ -178,8 +184,49 @@ def buildGramDict(contents):
 
 		gramDict[key].append(words[n-1])
 
-# *****************
+# ************************
 
+
+
+
+
+# **************** Rhyming dictionary *********
+
+# Populates rhymingDictionary which maps the rhyming part of a syllable to words that contain
+# it in their first syllable.
+def buildRhymingDict(contents):
+	words = processPhrase(contents)
+	for word in words:
+		print(word)
+		if word in boringWords: continue
+		syllables = getSyllables([word])
+		for pron in syllables[0]:
+			print(pron)
+			key = ""
+			# Get stressed syllable and suffix from syl1
+			stressed = [s for s in pron if containsDigit(s)][0] # We know there will only be one stressed syl
+			stressIndex = pron.index(stressed)
+			suffix = pron[stressIndex + 1:]
+			key = stressed + ''.join(suffix)
+			print(key)
+			rhymingDictionary[key].add(word)
+			print("\n")
+
+
+	# words = processPhrase(contents)
+	# for i in range(len(words)):
+	# 	word1 = words[i]
+	# 	if word1 in boringWords: continue
+	# 	for j in range(i):
+	# 		word2 = words[j]
+	# 		if word2 in boringWords: continue
+	# 		if word1 == word2: continue
+	# 		if rhymesWith(word1, word2): 
+	# 			rhymingDictionary[word1].add(word2)
+	# 			rhymingDictionary[word2].add(word1)
+
+
+# **********************************************
 
 
 
@@ -190,33 +237,36 @@ def buildGramDict(contents):
 f = open('chanceLyrics.txt')
 contents = f.read()
 
-buildGramDict(sentence)
+# buildGramDict(sentence)
+buildRhymingDict(sentence)
+for k, v in rhymingDictionary.iteritems():
+	print("{}, {}".format(k, v))
 
-lines = sentence.splitlines()
-phrase = ''
-lineCount = 0
-phraseCount = 0
-for i in range(len(lines)):
-	if lines[i] == '': continue
+# lines = sentence.splitlines()
+# phrase = ''
+# lineCount = 0
+# phraseCount = 0
+# for i in range(len(lines)):
+# 	if lines[i] == '': continue
 
-	lineCount += 1
-	updateLineDistCounts(lines[i])
-	phrase = phrase + " " + lines[i]
-	if ((i + 1) % phrase_len is 0):
-		phraseCount += 1
-		phraseSylDict = getSyllables(processPhrase(phrase))
-		updateRhymeDistCounts(phraseSylDict)
-		phrase = ''
-normalizeLineDist(lineCount)
-normalizeRhymeDist(phraseCount)
+# 	lineCount += 1
+# 	updateLineDistCounts(lines[i])
+# 	phrase = phrase + " " + lines[i]
+# 	if ((i + 1) % phrase_len is 0):
+# 		phraseCount += 1
+# 		phraseSylDict = getSyllables(processPhrase(phrase))
+# 		updateRhymeDistCounts(phraseSylDict)
+# 		phrase = ''
+# normalizeLineDist(lineCount)
+# normalizeRhymeDist(phraseCount)
 
-# Write model to file (rhymeDist, lineLenDist, gramDict)
-pickle.dump(rhymeDist, open("rhymeDist.p", "wb"))
-pickle.dump(lineLenDist, open("lineLenDist.p", "wb"))
-pickle.dump(gramDict, open("gramDict.p", "wb"))
-print(rhymeDist)
-print(lineLenDist)
-print(gramDict)
+# # Write model to file (rhymeDist, lineLenDist, gramDict)
+# pickle.dump(rhymeDist, open("rhymeDist.p", "wb"))
+# pickle.dump(lineLenDist, open("lineLenDist.p", "wb"))
+# pickle.dump(gramDict, open("gramDict.p", "wb"))
+# print(rhymeDist)
+# print(lineLenDist)
+# print(gramDict)
 
 
 

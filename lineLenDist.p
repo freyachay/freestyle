@@ -6,9 +6,9 @@ float
 p1
 tp2
 Rp3
-I4
+I1
 F0.25
-sI5
+sI2
 F0.5
 sI6
 F0.25
