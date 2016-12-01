@@ -1,5 +1,6 @@
 import nltk
 import fmdict
+import collections
 from nltk.corpus import cmudict
 from nltk.tokenize import word_tokenize, wordpunct_tokenize, sent_tokenize
 
@@ -9,28 +10,44 @@ extraDict = fmdict.extraDict
 
 phrase_len = 2
 
-# Looks for stressed syllables
-def getSyllables(word):
-	syllables = []
+# This takes in a phrase (list of words) and returns a list of syllables made up of sounds.
+def getSyllables(phrase):
+	syllables = collections.defaultdict(list)
 	currentSyl = []
-	for sounds in mainDict[word.lower()]:
-		print(sounds)
-		for sound in sounds:
-			print(sound)
-			currentSyl.append(sound)
-			if (sound[-1]).isdigit():
-				syllables.append(currentSyl)
+
+	# For each pronunciation
+	globalSylIndex = 0
+	localSylIndex = 0
+	for word in phrase:
+		for pronunciation in mainDict[word.lower()]:
+			localSylIndex = globalSylIndex	
+			for sound in pronunciation:
+				currentSyl.append(sound)
+
+				if (sound[-1]).isdigit():
+					prev = syllables[localSylIndex]
+					if currentSyl not in prev:
+						prev.append(currentSyl)
+						syllables[localSylIndex] = prev
+
+					localSylIndex += 1
+					currentSyl = []
+
+			if currentSyl is not []:
+				lastSyl = syllables[localSylIndex - 1]
+				lastPron = lastSyl[-1]
+				for sound in currentSyl:
+					lastPron.append(sound)
+
+				if lastPron not in lastSyl:
+					lastSyl[-1] = lastPron
+					syllables[localSylIndex - 1] = lastSyl
 				currentSyl = []
-
-
-	if currentSyl is not []:
-		lastSyl = syllables[-1]
-		for sound in currentSyl:
-			lastSyl.append(sound)
-		syllables[-1] = lastSyl
+				
+		globalSylIndex = localSylIndex + 1
 	return syllables
 
-print(getSyllables("table"))
+print(getSyllables(["graduate", "water", "bottle", "chair"]))
 
 # def getRhymeScore(pron1, pron2):
 # 	return 1
