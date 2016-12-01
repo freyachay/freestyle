@@ -60,11 +60,6 @@ def getSyllables(phrase):
 		globalSylIndex = localSylIndex
 	return syllables
 
-# def getRhymeScore(pron1, pron2):
-# 	return 1
-
-
-
 def processPhrase(phrase):
 	tokens = wordpunct_tokenize(phrase)
 	punct = ['.', ',', '!', ':', ';']
@@ -72,8 +67,6 @@ def processPhrase(phrase):
 	return words
 
 
-# 	for s in phraseSounds:
-# 		print s
 def updateRhymeDist(phraseSylDict):
 	for k, v in phraseSylDict.iteritems():
 		print("{}: {}").format(k, v)
@@ -92,15 +85,3 @@ def processCorpus():
 			phrase = ''
 
 processCorpus()
-
-# # Extract list of words
-
-
-# pairs = []
-# for w in words:
-
-
-
-
-
-# for pair in pairs: print(pair)
