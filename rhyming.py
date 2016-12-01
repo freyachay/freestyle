@@ -4,7 +4,7 @@ import collections
 from nltk.corpus import cmudict
 from nltk.tokenize import word_tokenize, wordpunct_tokenize, sent_tokenize
 
-sentence = "Unawareness I am sitting,\n at a table with!\n a water bottle \n Merrily we go"
+sentence = "Unawareness I am sitting,\n at a table with!\n a water bottle \n Merrily we go gibberishhh"
 mainDict = cmudict.dict()
 extraDict = fmdict.extraDict
 
@@ -33,7 +33,10 @@ def getSyllables(phrase):
 	globalSylIndex = 0
 	localSylIndex = 0
 	for word in phrase:
-		for pronunciation in getPron(word):
+		possibleProns = getPron(word)
+		if possibleProns is None: continue
+
+		for pronunciation in possibleProns:
 			localSylIndex = globalSylIndex	
 			for sound in pronunciation:
 				currentSyl.append(sound)
