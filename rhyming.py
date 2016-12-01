@@ -4,13 +4,14 @@ from collections import defaultdict
 from nltk.corpus import cmudict
 from nltk.tokenize import word_tokenize, wordpunct_tokenize, sent_tokenize
 
-sentence = "Listen up people \n church and steeple \n I never ever pie \n Cause I'm a guy sky"
+sentence = "Listen up people \n church and steeple \n I never ever pie \n Cause I a guy sky"
 mainDict = cmudict.dict()
 extraDict = fmdict.extraDict
 
 phrase_len = 2
 
 rhymeDist = defaultdict(lambda: defaultdict(float))
+lineLenDist = defaultdict(float)
 
 # Takes in a word. Looks it up in either extraDict or mainDict and returns list of pronunciations
 # (list of lists of sounds)
@@ -87,11 +88,9 @@ def sylRhymes(syl1, syl2):
 	stressIndex2 = syl2.index(stressed2)
 	suffix2 = syl2[stressIndex2 + 1:]
 
-	if (stressed1 == stressed2) and (suffix1 == suffix2):
-		print("{} rhymes with {}".format(syl1, syl2))
+	#if (stressed1 == stressed2) and (suffix1 == suffix2):
+		# print("{} rhymes with {}".format(syl1, syl2))
 	return (stressed1 == stressed2) and (suffix1 == suffix2)
-
-		
 
 def updateRhymeDistCounts(phraseSylDict):
 	for pos1, prons in phraseSylDict.iteritems():
@@ -111,20 +110,32 @@ def normalizeRhymeDist(phraseCount):
 		for k, v in count.iteritems():
 			(rhymeDist[pos])[k] = v/phraseCount
 
+# Takes a line, updates line length distribution counts
+def updateLineDistCounts(line):
+	syllables = getSyllables(processPhrase(line))
+	lineLenDist[len(syllables)] += 1
+
+def normalizeLineDist(lineCount):
+	for length, count in lineLenDist.iteritems():
+		lineLenDist[length] = count/lineCount
+
 def processCorpus():
 	lines = sentence.splitlines()
 	phrase = ''
+	lineCount = 0
 	phraseCount = 0
 	for i in range(len(lines)):
+		lineCount += 1
+		updateLineDistCounts(lines[i])
 		phrase = phrase + lines[i]
 		if ((i + 1) % phrase_len is 0):
 			phraseCount += 1
 			phraseSylDict = getSyllables(processPhrase(phrase))
 			updateRhymeDistCounts(phraseSylDict)
 			phrase = ''
-	print(rhymeDist)
+	normalizeLineDist(lineCount)
 	normalizeRhymeDist(phraseCount)
+	print(lineLenDist)
+	print("\n")
 	print(rhymeDist)
-
-
 processCorpus()
