@@ -22,6 +22,7 @@ def getPron(word):
 	# Look in cmudict
 	if word.lower() in mainDict.keys():
 		return mainDict[word.lower()]
+	print(word)
 	return None
 
 def containsDigit(string):
@@ -120,16 +121,23 @@ def normalizeLineDist(lineCount):
 		lineLenDist[length] = count/lineCount
 
 def processCorpus():
-	lines = sentence.splitlines()
+	f = open('chanceLyrics.txt')
+	contents = f.read()
+
+	lines = contents.splitlines()
 	phrase = ''
 	lineCount = 0
 	phraseCount = 0
 	for i in range(len(lines)):
+		if lines[i] == '': continue
+
 		lineCount += 1
 		updateLineDistCounts(lines[i])
-		phrase = phrase + lines[i]
+		phrase = phrase + " " + lines[i]
 		if ((i + 1) % phrase_len is 0):
 			phraseCount += 1
+			print(phrase)
+			print(processPhrase(phrase))
 			phraseSylDict = getSyllables(processPhrase(phrase))
 			updateRhymeDistCounts(phraseSylDict)
 			phrase = ''
@@ -138,4 +146,15 @@ def processCorpus():
 	print(lineLenDist)
 	print("\n")
 	print(rhymeDist)
+
 processCorpus()
+
+
+
+
+
+
+
+
+
+
