@@ -7,6 +7,7 @@ from collections import defaultdict
 n = model.n
 phraseLen = model.phraseLen
 numPhrases = 10
+rhymeThresh = 0.01
 
 def dd():
 	return defaultdict(float)
@@ -19,96 +20,120 @@ rhymingDictionary = pickle.load(open("rhymingDictionary.p", "rb"))
 # Uses ngram dict to generate next word
 def generateWord(prev):
 	if len(gramDict[prev]) is 0:
-		print("generate returning empty")
+		#print("generate returning empty")
 		return ""
 	return random.choice(gramDict[prev])
 
 
 # Returns a number of syllables for a line
 def sampleLineLength():
-	return 16
+	return 5
 	# TO DO
 
-def getRhymeTarget(pos):
-	distribution = rhymeDist[pos]
 
-
-def getPrevTuple(currentPhrase, pos):
-	prevGram = tuple(currentPhrase[(len(currentPhrase) - n + 1):])
+def getPrevTuple(totalPhrase, pos):
+	prevGram = tuple(totalPhrase[(len(totalPhrase) - n + 1):])
 	if prevGram[len(prevGram) - 1] is "\n":
-		return tuple(currentPhrase[(len(currentPhrase) - n): len(currentPhrase) - 1])
+		return tuple(totalPhrase[(len(totalPhrase) - n): len(totalPhrase) - 1])
 	return prevGram
 
 # Takes in a list of pronunciations of a syllable.
 # Returns a word that starts by rhyming with given syllable, or returns "" if nothing found
 def findRhyme(sylProns):
 	# Get stressed vowel + suffix from syl
-	print(sylProns)
 
 	# Try all pronunciations of syl
 	for pron in sylProns:
 		stressed = [s for s in pron if model.containsDigit(s)][0]
-		print(stressed)
 		stressIndex = pron.index(stressed)
 		suffix = pron[stressIndex + 1:]
 		key = stressed + ''.join(suffix)
 
-		print(key)
 		# Look rhyming sound up in rhyming dictionary, find a word!
 		rhymingWords = rhymingDictionary[key]
-		print(rhymingWords)
-		if len(rhymingWords) > 0:
-			# **** Returns random word that rhymes
-			return random.sample(rhymingWords, 1)[0]
+		validRhymingWords = []
+		for word in rhymingWords:
+			rhymeProns = model.getSyllables(word)[0]
+			if rhymeProns is not sylProns: validRhymingWords.append(word)
+
+		if len(rhymingWords) is not 0:
+			return random.sample(validRhymingWords, 1)[0]
 
 	# No rhymes found for any pronunciation
 	return ""
 
+# Takes in a position, checks rhymeDist, looks for a word that starts with rhyme target (in order of
+# rhyme target probability)
 def sampleRhymeDist(currentPhrase, pos):
 	# Sorted rhyme targets sorted by probability
 	targets = rhymeDist[pos]
+	if len(targets) is 0: return ""
+
+	# Eliminate targets below probability threshold
+	filteredTargets = [i for i in targets.keys() if targets[i] > rhymeThresh]
+
 	sortedTargets = sorted(targets, key=targets.get, reverse = True)
+	finalTargets = [t for t in sortedTargets if t in filteredTargets]
+
+	print(finalTargets)
+
 	phraseSyllables = model.getSyllables(currentPhrase)
-	for target in sortedTargets:
+	for target in finalTargets:
 		rhymeWord = findRhyme(phraseSyllables[target])
 		if rhymeWord is not "":
+			print("Rhyming word: {}".format(rhymeWord))
 			return rhymeWord
+	print("Failed to find a rhyme")
 	return ""
 
 # ************* Main script ***************
 
 # Start with a random word
 firstGram = random.choice(gramDict.keys())
-lineLength = sampleLineLength()
+targetLineLength = sampleLineLength()
+
 currentPhrase = [word for word in firstGram]
+totalPhrase = [word for word in firstGram]
+
+currentPhraseLength = len(model.getSyllables(currentPhrase))
 currentLineLength = len(model.getSyllables(currentPhrase))
+totalPhraseLength = len(model.getSyllables(currentPhrase))
 
 
-print(lineLength)
 for _ in range(numPhrases):
 	for _ in range(phraseLen):
 		# Generate line
-		while (currentLineLength < lineLength):
-			# Does the next word need to rhyme?
-			rhymeTarget = getRhymeTarget(currentLineLength)
-			if (rhymeTarget is not -1): # We need a rhyme!
-				print("We need a rhyme!")
-				nextWord = sampleRhymeDist(currentPhrase, currentLineLength)
+		while (currentLineLength < targetLineLength):
+			print("Current phrase: {}, length = {}".format(currentPhrase, currentPhraseLength))
+			print("Total phrase: {}, length = {}".format(totalPhrase, totalPhraseLength))
+			print("Target line len: {}, current line len: {}".format(targetLineLength, currentLineLength))
+			print("\n")
+			# See if we need to rhyme
+			nextWord = sampleRhymeDist(currentPhrase, currentLineLength)
 
 			# Either we don't need to rhyme or we couldn't find a rhyme
-			if (nextWord is "" or rhymeTarget is -1):
-				print("Couldn't find one or don't need one")
+			if (nextWord is ""):
 				# Generate word from n grams
-				nextWord = generateWord(getPrevTuple(currentPhrase, currentLineLength))
+				nextWord = generateWord(getPrevTuple(totalPhrase, totalPhraseLength))
 				while(nextWord is ""):
 					nextWord = generateWord(random.choice(gramDict.keys()))
 
 			print("THE NEXT WORD IS: {}".format(nextWord))
 			currentPhrase.append(nextWord)
-			currentLineLength += len(model.getSyllables(nextWord))
+			totalPhrase.append(nextWord)
+			print("before: {}".format(currentLineLength))
+			print(model.getSyllables([nextWord]))
+			currentLineLength += len(model.getSyllables([nextWord]))
+			print("after: {}".format(currentLineLength))
+			print("\n")
+			currentPhraseLength += len(model.getSyllables([nextWord]))
+			totalPhraseLength += len(model.getSyllables([nextWord]))
 		currentPhrase.append("\n")
+		totalPhrase.append("\n")
 		currentLineLength = 0
+	currentPhraseLength = 0
+	currentPhrase = []
 
 
-print(' '.join(currentPhrase))
+print(' '.join(totalPhrase))
 		
