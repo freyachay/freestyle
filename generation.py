@@ -100,7 +100,6 @@ currentPhraseLength = len(model.getSyllables(currentPhrase))
 currentLineLength = len(model.getSyllables(currentPhrase))
 totalPhraseLength = len(model.getSyllables(currentPhrase))
 
-
 for _ in range(numPhrases):
 	for _ in range(phraseLen):
 		targetLineLength = sampleLineLength()
