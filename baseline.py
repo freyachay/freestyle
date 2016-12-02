@@ -26,7 +26,6 @@ def create_dict(grams, n):
 def generate_word(key, gramDict, words):
 	if len(gramDict[key]) is 0:
 		return ""
-		#return random.choice(words)
 	return random.choice(gramDict[key])
 
 n = 2
