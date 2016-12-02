@@ -1,6 +1,7 @@
 import pickle
 import random
 import model
+from numpy.random import choice
 from collections import defaultdict
 
 # Number of phrases to generate
@@ -20,15 +21,20 @@ rhymingDictionary = pickle.load(open("rhymingDictionary.p", "rb"))
 # Uses ngram dict to generate next word
 def generateWord(prev):
 	if len(gramDict[prev]) is 0:
-		#print("generate returning empty")
 		return ""
 	return random.choice(gramDict[prev])
 
 
 # Returns a number of syllables for a line
 def sampleLineLength():
-	return 5
-	# TO DO
+	elements = []
+	weights = []
+
+	for k, v in lineLenDist.iteritems():
+		elements.append(k)
+		weights.append(v)
+
+	return choice(elements, p=weights)
 
 
 def getPrevTuple(totalPhrase, pos):
@@ -75,22 +81,17 @@ def sampleRhymeDist(currentPhrase, pos):
 	sortedTargets = sorted(targets, key=targets.get, reverse = True)
 	finalTargets = [t for t in sortedTargets if t in filteredTargets]
 
-	print(finalTargets)
-
 	phraseSyllables = model.getSyllables(currentPhrase)
 	for target in finalTargets:
 		rhymeWord = findRhyme(phraseSyllables[target])
 		if rhymeWord is not "":
-			print("Rhyming word: {}".format(rhymeWord))
 			return rhymeWord
-	print("Failed to find a rhyme")
 	return ""
 
 # ************* Main script ***************
 
 # Start with a random word
 firstGram = random.choice(gramDict.keys())
-targetLineLength = sampleLineLength()
 
 currentPhrase = [word for word in firstGram]
 totalPhrase = [word for word in firstGram]
@@ -102,12 +103,9 @@ totalPhraseLength = len(model.getSyllables(currentPhrase))
 
 for _ in range(numPhrases):
 	for _ in range(phraseLen):
+		targetLineLength = sampleLineLength()
 		# Generate line
 		while (currentLineLength < targetLineLength):
-			print("Current phrase: {}, length = {}".format(currentPhrase, currentPhraseLength))
-			print("Total phrase: {}, length = {}".format(totalPhrase, totalPhraseLength))
-			print("Target line len: {}, current line len: {}".format(targetLineLength, currentLineLength))
-			print("\n")
 			# See if we need to rhyme
 			nextWord = sampleRhymeDist(currentPhrase, currentLineLength)
 
@@ -118,14 +116,9 @@ for _ in range(numPhrases):
 				while(nextWord is ""):
 					nextWord = generateWord(random.choice(gramDict.keys()))
 
-			print("THE NEXT WORD IS: {}".format(nextWord))
 			currentPhrase.append(nextWord)
 			totalPhrase.append(nextWord)
-			print("before: {}".format(currentLineLength))
-			print(model.getSyllables([nextWord]))
 			currentLineLength += len(model.getSyllables([nextWord]))
-			print("after: {}".format(currentLineLength))
-			print("\n")
 			currentPhraseLength += len(model.getSyllables([nextWord]))
 			totalPhraseLength += len(model.getSyllables([nextWord]))
 		currentPhrase.append("\n")
@@ -134,6 +127,6 @@ for _ in range(numPhrases):
 	currentPhraseLength = 0
 	currentPhrase = []
 
-
+# Prints final result
 print(' '.join(totalPhrase))
 		
