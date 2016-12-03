@@ -216,7 +216,8 @@ def buildRhymingDict(contents):
 
 # ***** Main script *****
 
-def main(contents):
+
+def buildModel(contents):
 	# Construct n-gram and rhyming dictionaries
 	buildGramDict(contents)
 	buildRhymingDict(contents)
@@ -241,31 +242,21 @@ def main(contents):
 	normalizeRhymeDist(phraseCount)
 	return (rhymeDist, lineLenDist, gramDict, rhymingDictionary)
 
+def pickleFiles(styleName):
+	pickle.dump(rhymeDist, open("rhymeDist" + styleName + ".p", "wb"))
+	pickle.dump(lineLenDist, open("lineLenDist" + styleName + ".p", "wb"))
+	pickle.dump(gramDict, open("gramDict" + styleName + ".p", "wb"))
+	pickle.dump(rhymingDictionary, open("rhymingDictionary" + styleName + ".p", "wb"))
 
-f = open('chanceLyrics.txt')
-contents = f.read()
-main(contents)
+def processStyle(styleName):
+	f = open(styleName.lower() + "Lyrics.txt")
+	contents = f.read()
+	buildModel(contents)
+	pickleFiles(styleName)
 
-# Chance the Rapper
-pickle.dump(rhymeDist, open("rhymeDistChance.p", "wb"))
-pickle.dump(lineLenDist, open("lineLenDistChance.p", "wb"))
-pickle.dump(gramDict, open("gramDictChance.p", "wb"))
-pickle.dump(rhymingDictionary, open("rhymingDictionaryChance.p", "wb"))
-
-f = open('nickiLyrics.txt')
-contents = f.read()
-main(contents)
-
-# Nicki Minaj
-pickle.dump(rhymeDist, open("rhymeDistNicki.p", "wb"))
-pickle.dump(lineLenDist, open("lineLenDistNicki.p", "wb"))
-pickle.dump(gramDict, open("gramDictNicki.p", "wb"))
-pickle.dump(rhymingDictionary, open("rhymingDictionaryNicki.p", "wb"))
-
-
-
-
-
+# Comment this out when running generation
+processStyle("Chance")
+processStyle("Nicki")
 
 
 
