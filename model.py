@@ -256,6 +256,7 @@ def processStyle(styleName):
 
 # Comment this out when running generation
 processStyle("Chance")
+print("Next style")
 processStyle("Nicki")
 
 
