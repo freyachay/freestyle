@@ -11,14 +11,20 @@ def genCorpus(style):
 	corpus = set(model.processPhrase(contents))
 
 # ********* Creating search problem *********
+
+# Low fluency (eh) + missed rhyme opportunity (WORSE)
+def costFunction(newState):
+
+	 
+
 class SegmentationProblem(util.SearchProblem):
     def __init__(self, startGram, costFunction):
         self.startGram = startGram
         self.costFunction = costFunction
 
-    # State = (list of words so far in phrase, number of lines so far)
+    # State = (list of words so far in phrase, number of lines so far, target line length)
     def startState(self):
-        return (list(startGrams), 0)
+        return (list(startGrams), 0, generation.sampleLineLength())
 
     # We have generated enough lines for a complete phrase
     def isEnd(self, state):
@@ -27,15 +33,24 @@ class SegmentationProblem(util.SearchProblem):
     def succAndCost(self, state):
     	# List of tuples = (successor state, cost)
         results = []
+        (prevPhrase, prevLines, targetLineLen) = state
 
+        for word in corpus:
+        	succPhrase = prevPhrase.append(word)
+        	syllables = model.getSyllables(succPhrase)
+
+        	# Add a new line character and get new line length once we've made a line
+        	if (syllables >= targetLineLen):
+        		succPhrase.append("\n")
+        		newState = (succPhrase, prevLines + 1, generation.sampleLineLength())
+        	else:
+        		newState = (succPhrase, prevLines, targetLineLen)
+
+        	results.append(newState, costFunction(newState))
 
         return results
 
 # ************************************
-
-# Low fluency + missed rhyme opportunity
-def costFunction:
-	return 8
 
 # *********** Solve search problem ******
 
