@@ -216,37 +216,51 @@ def buildRhymingDict(contents):
 
 # ***** Main script *****
 
-# f = open('chanceLyrics.txt')
-# contents = f.read()
+def main(contents):
+	# Construct n-gram and rhyming dictionaries
+	buildGramDict(contents)
+	buildRhymingDict(contents)
 
-# # Construct n-gram and rhyming dictionaries
-# buildGramDict(contents)
-# buildRhymingDict(contents)
+	# Build probability models
+	lines = contents.splitlines()
+	phrase = ''
+	lineCount = 0
+	phraseCount = 0
+	for i in range(len(lines)):
+		if lines[i] == '': continue
 
-# # Build probability models
-# lines = contents.splitlines()
-# phrase = ''
-# lineCount = 0
-# phraseCount = 0
-# for i in range(len(lines)):
-# 	if lines[i] == '': continue
+		lineCount += 1
+		updateLineDistCounts(lines[i])
+		phrase = phrase + " " + lines[i]
+		if ((i + 1) % phraseLen is 0):
+			phraseCount += 1
+			phraseSylDict = getSyllables(processPhrase(phrase))
+			updateRhymeDistCounts(phraseSylDict)
+			phrase = ''
+	normalizeLineDist(lineCount)
+	normalizeRhymeDist(phraseCount)
+	return (rhymeDist, lineLenDist, gramDict, rhymingDictionary)
 
-# 	lineCount += 1
-# 	updateLineDistCounts(lines[i])
-# 	phrase = phrase + " " + lines[i]
-# 	if ((i + 1) % phraseLen is 0):
-# 		phraseCount += 1
-# 		phraseSylDict = getSyllables(processPhrase(phrase))
-# 		updateRhymeDistCounts(phraseSylDict)
-# 		phrase = ''
-# normalizeLineDist(lineCount)
-# normalizeRhymeDist(phraseCount)
 
-# # Write model to file (rhymeDist, lineLenDist, gramDict, rhymingDictionary)
-# pickle.dump(rhymeDist, open("rhymeDist.p", "wb"))
-# pickle.dump(lineLenDist, open("lineLenDist.p", "wb"))
-# pickle.dump(gramDict, open("gramDict.p", "wb"))
-# pickle.dump(rhymingDictionary, open("rhymingDictionary.p", "wb"))
+f = open('chanceLyrics.txt')
+contents = f.read()
+main(contents)
+
+# Chance the Rapper
+pickle.dump(rhymeDist, open("rhymeDistChance.p", "wb"))
+pickle.dump(lineLenDist, open("lineLenDistChance.p", "wb"))
+pickle.dump(gramDict, open("gramDictChance.p", "wb"))
+pickle.dump(rhymingDictionary, open("rhymingDictionaryChance.p", "wb"))
+
+f = open('nickiLyrics.txt')
+contents = f.read()
+main(contents)
+
+# Nicki Minaj
+pickle.dump(rhymeDist, open("rhymeDistNicki.p", "wb"))
+pickle.dump(lineLenDist, open("lineLenDistNicki.p", "wb"))
+pickle.dump(gramDict, open("gramDictNicki.p", "wb"))
+pickle.dump(rhymingDictionary, open("rhymingDictionaryNicki.p", "wb"))
 
 
 
