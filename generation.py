@@ -7,7 +7,7 @@ from collections import defaultdict
 # Number of phrases to generate
 n = model.n
 phraseLen = model.phraseLen
-numPhrases = 10
+numPhrases = 2
 rhymeThresh = 0.01
 
 # Model global variables
