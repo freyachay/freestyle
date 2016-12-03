@@ -1,28 +1,39 @@
 import generation
 import searchUtil
+import model
+
+corpus = set()
+
+def genCorpus(style):
+	global corpus
+	f = open(style.lower() + "Lyrics.txt")
+	contents = f.read()
+	corpus = set(model.processPhrase(contents))
 
 # ********* Creating search problem *********
 class SegmentationProblem(util.SearchProblem):
-    def __init__(self, query, unigramCost):
-        self.query = query
-        self.unigramCost = unigramCost
+    def __init__(self, startGram, costFunction):
+        self.startGram = startGram
+        self.costFunction = costFunction
 
+    # State = (list of words so far in phrase, number of lines so far)
     def startState(self):
-        return self.query
+        return (list(startGrams), 0)
 
+    # We have generated enough lines for a complete phrase
     def isEnd(self, state):
-        return (len(state) == 0)
+        return (state[1] == generation.phraseLen)
 
     def succAndCost(self, state):
+    	# List of tuples = (successor state, cost)
         results = []
 
-        for i in range(len(state) + 1):
-            results.append((state[:i], state[i:], self.unigramCost(state[:i])))
 
         return results
 
 # ************************************
 
+# Low fluency + missed rhyme opportunity
 def costFunction:
 	return 8
 
@@ -35,4 +46,19 @@ def solve(startGram, unigramCost):
 
 
 # ************************************
+
+# ******* Main ******
+
+for style in ["Chance", "Nicki"]:
+	genCorpus(style)
+	print(corpus)
+
+	# Run solve numPhrases times
+
+
+
+
+
+
+
 

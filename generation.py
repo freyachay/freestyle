@@ -99,49 +99,6 @@ def sampleRhymeDist(currentPhrase, pos):
 			return rhymeWord
 	return ""
 
-# ************* Main script ***************
-
-# # Generates text given loaded model
-# # Returns a string of generated text
-# def generate():
-# 	# Start with a random word
-# 	firstGram = random.choice(gramDict.keys())
-
-# 	currentPhrase = [word for word in firstGram]
-# 	totalPhrase = [word for word in firstGram]
-
-# 	currentPhraseLength = len(model.getSyllables(currentPhrase))
-# 	currentLineLength = len(model.getSyllables(currentPhrase))
-# 	totalPhraseLength = len(model.getSyllables(currentPhrase))
-
-# 	for _ in range(numPhrases):
-# 		for _ in range(phraseLen):
-# 			targetLineLength = sampleLineLength()
-# 			# Generate line
-# 			while (currentLineLength < targetLineLength):
-# 				# See if we need to rhyme
-# 				nextWord = sampleRhymeDist(currentPhrase, currentLineLength)
-
-# 				# Either we don't need to rhyme or we couldn't find a rhyme
-# 				if (nextWord is ""):
-# 					# Generate word from n grams
-# 					nextWord = generateWord(getPrevTuple(totalPhrase, totalPhraseLength))
-# 					while(nextWord is ""):
-# 						nextWord = generateWord(random.choice(gramDict.keys()))
-
-# 				currentPhrase.append(nextWord)
-# 				totalPhrase.append(nextWord)
-# 				currentLineLength += len(model.getSyllables([nextWord]))
-# 				currentPhraseLength += len(model.getSyllables([nextWord]))
-# 				totalPhraseLength += len(model.getSyllables([nextWord]))
-# 			currentPhrase.append("\n")
-# 			totalPhrase.append("\n")
-# 			currentLineLength = 0
-# 		currentPhraseLength = 0
-# 		currentPhrase = []
-
-# 	return ' '.join(totalPhrase)
-
 # Takes in a generatedText, generates a model based on the generated text,
 # and returns the distance squared between the rhyme distribution of the 
 # generated model and target model 

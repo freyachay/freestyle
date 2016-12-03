@@ -28,8 +28,6 @@ lineLenDist = defaultdict(float)
 gramDict = defaultdict(list)
 rhymingDictionary = defaultdict(set)
 
-
-
 # ************* Helpers ***********
 
 # Takes a string and returns a list of words, seperated by punctuation (but not apostrophes or dashes)
@@ -256,7 +254,7 @@ def processStyle(styleName):
 # Comment this out when running generation
 # processStyle("Chance")
 # print("Next style")
-# processStyle("Nicki")
+processStyle("Nicki")
 
 
 

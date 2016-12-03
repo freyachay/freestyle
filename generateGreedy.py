@@ -4,12 +4,6 @@ import model
 import random
 from collections import defaultdict
 
-# # Model global variables
-# lineLenDist = None
-# gramDict = None
-# rhymeDist = None
-# rhymingDictionary = None
-
 def dd():
 	return defaultdict(float)
 
@@ -59,9 +53,20 @@ def generate():
 
 	return ' '.join(totalPhrase)
 
-generation.loadModel("Chance")
-generatedText = generate()
-print(generatedText)
-distance = generation.evaluate("Chance", generatedText)
-print(distance)
+# ******* Main **********
+
+for style in ["Chance", "Nicki"]:
+	generation.loadModel(style)
+	generatedText = generate()
+	print(generatedText)
+	distance = generation.evaluate(style, generatedText)
+	print(distance)
+	print("\n")
+
 plotter.plot()
+
+
+
+
+
+
