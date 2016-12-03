@@ -1,3 +1,4 @@
+import generation
 import searchUtil
 
 # ********* Creating search problem *********
@@ -20,15 +21,18 @@ class SegmentationProblem(util.SearchProblem):
 
         return results
 
-def segmentWords(query, unigramCost):
-    if len(query) == 0:
-        return ''
+# ************************************
 
+def costFunction:
+	return 8
+
+# *********** Solve search problem ******
+
+def solve(startGram, unigramCost):
     ucs = util.UniformCostSearch(verbose=0)
-    ucs.solve(SegmentationProblem(query, unigramCost))
-
-    print(ucs.actions)
+    ucs.solve(SegmentationProblem(startGram, costFunction))
     return ' '.join(ucs.actions)
+
 
 # ************************************
 

@@ -5,22 +5,22 @@ import plotter
 from numpy.random import choice
 from collections import defaultdict
 
-# Number of phrases to generate
-n = model.n
-phraseLen = model.phraseLen
-numPhrases = 4
-rhymeThresh = 0.01
-
 # Model global variables
 lineLenDist = None
 gramDict = None
-rhymeDist = None 
+rhymeDist = None
 rhymingDictionary = None
+
+# Number of phrases to generate
+n = model.n
+phraseLen = model.phraseLen
+numPhrases = 1
+rhymeThresh = 0.01
 
 def dd():
 	return defaultdict(float)
 
-def loadPickleFiles(styleName):
+def loadModel(styleName):
 	global lineLenDist 
 	global gramDict
 	global rhymeDist 
@@ -101,51 +101,51 @@ def sampleRhymeDist(currentPhrase, pos):
 
 # ************* Main script ***************
 
-# Generates text given loaded model
-# Returns a string of generated text
-def generate():
-	# Start with a random word
-	firstGram = random.choice(gramDict.keys())
+# # Generates text given loaded model
+# # Returns a string of generated text
+# def generate():
+# 	# Start with a random word
+# 	firstGram = random.choice(gramDict.keys())
 
-	currentPhrase = [word for word in firstGram]
-	totalPhrase = [word for word in firstGram]
+# 	currentPhrase = [word for word in firstGram]
+# 	totalPhrase = [word for word in firstGram]
 
-	currentPhraseLength = len(model.getSyllables(currentPhrase))
-	currentLineLength = len(model.getSyllables(currentPhrase))
-	totalPhraseLength = len(model.getSyllables(currentPhrase))
+# 	currentPhraseLength = len(model.getSyllables(currentPhrase))
+# 	currentLineLength = len(model.getSyllables(currentPhrase))
+# 	totalPhraseLength = len(model.getSyllables(currentPhrase))
 
-	for _ in range(numPhrases):
-		for _ in range(phraseLen):
-			targetLineLength = sampleLineLength()
-			# Generate line
-			while (currentLineLength < targetLineLength):
-				# See if we need to rhyme
-				nextWord = sampleRhymeDist(currentPhrase, currentLineLength)
+# 	for _ in range(numPhrases):
+# 		for _ in range(phraseLen):
+# 			targetLineLength = sampleLineLength()
+# 			# Generate line
+# 			while (currentLineLength < targetLineLength):
+# 				# See if we need to rhyme
+# 				nextWord = sampleRhymeDist(currentPhrase, currentLineLength)
 
-				# Either we don't need to rhyme or we couldn't find a rhyme
-				if (nextWord is ""):
-					# Generate word from n grams
-					nextWord = generateWord(getPrevTuple(totalPhrase, totalPhraseLength))
-					while(nextWord is ""):
-						nextWord = generateWord(random.choice(gramDict.keys()))
+# 				# Either we don't need to rhyme or we couldn't find a rhyme
+# 				if (nextWord is ""):
+# 					# Generate word from n grams
+# 					nextWord = generateWord(getPrevTuple(totalPhrase, totalPhraseLength))
+# 					while(nextWord is ""):
+# 						nextWord = generateWord(random.choice(gramDict.keys()))
 
-				currentPhrase.append(nextWord)
-				totalPhrase.append(nextWord)
-				currentLineLength += len(model.getSyllables([nextWord]))
-				currentPhraseLength += len(model.getSyllables([nextWord]))
-				totalPhraseLength += len(model.getSyllables([nextWord]))
-			currentPhrase.append("\n")
-			totalPhrase.append("\n")
-			currentLineLength = 0
-		currentPhraseLength = 0
-		currentPhrase = []
+# 				currentPhrase.append(nextWord)
+# 				totalPhrase.append(nextWord)
+# 				currentLineLength += len(model.getSyllables([nextWord]))
+# 				currentPhraseLength += len(model.getSyllables([nextWord]))
+# 				totalPhraseLength += len(model.getSyllables([nextWord]))
+# 			currentPhrase.append("\n")
+# 			totalPhrase.append("\n")
+# 			currentLineLength = 0
+# 		currentPhraseLength = 0
+# 		currentPhrase = []
 
-	return ' '.join(totalPhrase)
+# 	return ' '.join(totalPhrase)
 
 # Takes in a generatedText, generates a model based on the generated text,
 # and returns the distance squared between the rhyme distribution of the 
 # generated model and target model 
-def evaluate(generatedText):
+def evaluate(targetStyle, generatedText):
 	# Create genModel: i.e. the model of our generated text
 	(genRhymeDist, _, _, _) = model.buildModel(generatedText)
 
@@ -161,15 +161,7 @@ def evaluate(generatedText):
 	for i in range(numSamples):
 		lineLen = sampleLineLength()
 		# Plot graph of generated rhyme dist and model rhyme dist at pos
-		plotter.evaluationGraph('Chance', genRhymeDist, lineLen)
+		plotter.evaluationGraph(targetStyle, genRhymeDist, lineLen)
 
 	return distance
-
-
-loadPickleFiles("Chance")
-generatedText = generate()
-print(generatedText)
-distance = evaluate(generatedText)
-print(distance)
-plotter.plot()
 		
