@@ -12,7 +12,7 @@ rhymeDist = pickle.load(open("rhymeDist.p", "rb"))
 rhymingDictionary = pickle.load(open("rhymingDictionary.p", "rb"))
 
 ### Generate Line Length Distribution graph
-plt.figure(1)
+plt.figure("Chance Lines")
 x = []
 y = []
 for length, prob in lineLenDist.iteritems():
@@ -25,7 +25,7 @@ plt.ylabel("Probability")
 
 
 ### Generate Series of Rhyme Distribution Graphs
-plt.figure(2)
+plt.figure("Chance Rhymes")
 rhymePos = 14 # most common line length * number of lines in phrase, i.e. last word in phrase
 
 x = [i for i in range(14)]
