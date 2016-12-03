@@ -10,13 +10,20 @@ phraseLen = model.phraseLen
 numPhrases = 10
 rhymeThresh = 0.01
 
+# Model global variables
+lineLenDist = None
+gramDict = None
+rhymeDist = None 
+rhymingDictionary = None
+
 def dd():
 	return defaultdict(float)
 
-lineLenDist = pickle.load(open("lineLenDist.p", "rb"))
-gramDict = pickle.load(open("gramDict.p", "rb"))
-rhymeDist = pickle.load(open("rhymeDist.p", "rb"))
-rhymingDictionary = pickle.load(open("rhymingDictionary.p", "rb"))
+def loadPickleFiles(styleName):
+	lineLenDist = pickle.load(open("lineLenDist" + styleName + ".p", "rb"))
+	gramDict = pickle.load(open("gramDict" + styleName + ".p", "rb"))
+	rhymeDist = pickle.load(open("rhymeDist" + styleName + ".p", "rb"))
+	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + ".p", "rb"))
 
 # Uses ngram dict to generate next word
 def generateWord(prev):
@@ -90,42 +97,68 @@ def sampleRhymeDist(currentPhrase, pos):
 
 # ************* Main script ***************
 
-# Start with a random word
-firstGram = random.choice(gramDict.keys())
+# Generates text given loaded model
+# Returns a string of generated text
+def generate():
+	# Start with a random word
+	firstGram = random.choice(gramDict.keys())
 
-currentPhrase = [word for word in firstGram]
-totalPhrase = [word for word in firstGram]
+	currentPhrase = [word for word in firstGram]
+	totalPhrase = [word for word in firstGram]
 
-currentPhraseLength = len(model.getSyllables(currentPhrase))
-currentLineLength = len(model.getSyllables(currentPhrase))
-totalPhraseLength = len(model.getSyllables(currentPhrase))
+	currentPhraseLength = len(model.getSyllables(currentPhrase))
+	currentLineLength = len(model.getSyllables(currentPhrase))
+	totalPhraseLength = len(model.getSyllables(currentPhrase))
 
-for _ in range(numPhrases):
-	for _ in range(phraseLen):
-		targetLineLength = sampleLineLength()
-		# Generate line
-		while (currentLineLength < targetLineLength):
-			# See if we need to rhyme
-			nextWord = sampleRhymeDist(currentPhrase, currentLineLength)
+	for _ in range(numPhrases):
+		for _ in range(phraseLen):
+			targetLineLength = sampleLineLength()
+			# Generate line
+			while (currentLineLength < targetLineLength):
+				# See if we need to rhyme
+				nextWord = sampleRhymeDist(currentPhrase, currentLineLength)
 
-			# Either we don't need to rhyme or we couldn't find a rhyme
-			if (nextWord is ""):
-				# Generate word from n grams
-				nextWord = generateWord(getPrevTuple(totalPhrase, totalPhraseLength))
-				while(nextWord is ""):
-					nextWord = generateWord(random.choice(gramDict.keys()))
+				# Either we don't need to rhyme or we couldn't find a rhyme
+				if (nextWord is ""):
+					# Generate word from n grams
+					nextWord = generateWord(getPrevTuple(totalPhrase, totalPhraseLength))
+					while(nextWord is ""):
+						nextWord = generateWord(random.choice(gramDict.keys()))
 
-			currentPhrase.append(nextWord)
-			totalPhrase.append(nextWord)
-			currentLineLength += len(model.getSyllables([nextWord]))
-			currentPhraseLength += len(model.getSyllables([nextWord]))
-			totalPhraseLength += len(model.getSyllables([nextWord]))
-		currentPhrase.append("\n")
-		totalPhrase.append("\n")
-		currentLineLength = 0
-	currentPhraseLength = 0
-	currentPhrase = []
+				currentPhrase.append(nextWord)
+				totalPhrase.append(nextWord)
+				currentLineLength += len(model.getSyllables([nextWord]))
+				currentPhraseLength += len(model.getSyllables([nextWord]))
+				totalPhraseLength += len(model.getSyllables([nextWord]))
+			currentPhrase.append("\n")
+			totalPhrase.append("\n")
+			currentLineLength = 0
+		currentPhraseLength = 0
+		currentPhrase = []
 
-# Prints final result
-print(' '.join(totalPhrase))
+	return ' '.join(totalPhrase)
+
+# Takes in a generatedText, generates a model based on the generated text,
+# and returns the distance squared between the rhyme distribution of the 
+# generated model and target model 
+def evaluate(generatedText):
+	# Create genModel: i.e. the model of our generated text
+	(genRhymeDist, _, _, _) = main.buildModel(generatedText)
+
+	distance = 0
+	# Iterate through every postition that appears in model 
+	for pos, targetDist in rhymeDist.iteritems():
+		genDist = genRhymeDist[pos]
+		keySuperSet = set(targetDist.keys()).union(set(genDist.keys()))
+		for key in keySuperSet:
+			distance += (targetDist[key] - genDist[key])^2
+
+	return distance
+
+
+loadPickleFiles("Chance")
+generatedText = generate()
+print(generatedText)
+distance = evaluate(generatedText)
+print(distance)
 		
