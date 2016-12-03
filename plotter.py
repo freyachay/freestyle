@@ -13,15 +13,21 @@ styleName = None
 def dd():
 	return defaultdict(float)
 
-def loadModel(styleName):
-	styleName = styleName
+def loadModel(style):
+	global lineLenDist 
+	global gramDict
+	global rhymeDist 
+	global rhymingDictionary
+	global styleName
+	styleName = style
 	lineLenDist = pickle.load(open("lineLenDist" + styleName + ".p", "rb"))
 	gramDict = pickle.load(open("gramDict" + styleName + ".p", "rb"))
 	rhymeDist = pickle.load(open("rhymeDist" + styleName + ".p", "rb"))
 	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + ".p", "rb"))
 
-def lineLenDistGraph():
-	### Generate Line Length Distribution graph
+# Generate Line Length Distribution graph
+def lineLenDistGraph(style):
+	loadModel(style)	
 	plt.figure("Lines")
 	x = []
 	y = []
@@ -33,16 +39,14 @@ def lineLenDistGraph():
 	plt.xlabel("Line Length (syllables)")
 	plt.ylabel("Probability")
 
+# Generate of Rhyme Distribution Graph for rhymePos
+def rhymeDistGraph(distribution, rhymePos):
+	plt.figure("Rhymes: {}".format(rhymePos))
 
-def rhymeDistGraph(rhymePos):
-	### Generate Series of Rhyme Distribution Graphs
-	plt.figure("Rhymes")
+	x = [i for i in range(rhymePos)]
+	y = [0] * rhymePos
 
-	x = [i for i in range(14)]
-	y = [0] * 14
-
-	dist = rhymeDist[rhymePos]
-	for pos, prob in dist.iteritems():
+	for pos, prob in distribution[rhymePos].iteritems():
 		y[pos] = prob
 
 	plt.plot(x, y)
@@ -50,7 +54,16 @@ def rhymeDistGraph(rhymePos):
 	plt.xlabel("Phrase position (syllables)")
 	plt.ylabel("Probability of syllable {} rhyming".format(rhymePos))
 
-loadModel('Chance')
-lineLenDist()
-rhymeDistGraph(14)
-plt.show()
+def evaluationGraph(targetStyle, genRhymeDist, rhymePos):
+	loadModel(targetStyle)
+	rhymeDistGraph(rhymeDist, rhymePos)
+	rhymeDistGraph(genRhymeDist, rhymePos)
+	
+
+def plot():
+	plt.show()
+
+# loadModel('Chance')
+# lineLenDist()
+# rhymeDistGraph(14)
+# plt.show()

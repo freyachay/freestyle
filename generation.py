@@ -1,13 +1,14 @@
 import pickle
 import random
 import model
+import plotter
 from numpy.random import choice
 from collections import defaultdict
 
 # Number of phrases to generate
 n = model.n
 phraseLen = model.phraseLen
-numPhrases = 2
+numPhrases = 4
 rhymeThresh = 0.01
 
 # Model global variables
@@ -28,11 +29,6 @@ def loadPickleFiles(styleName):
 	gramDict = pickle.load(open("gramDict" + styleName + ".p", "rb"))
 	rhymeDist = pickle.load(open("rhymeDist" + styleName + ".p", "rb"))
 	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + ".p", "rb"))
-
-	print(lineLenDist)
-	print(gramDict)
-	print(rhymeDist)
-	print(rhymingDictionary)
 
 # Uses ngram dict to generate next word
 def generateWord(prev):
@@ -151,7 +147,7 @@ def generate():
 # generated model and target model 
 def evaluate(generatedText):
 	# Create genModel: i.e. the model of our generated text
-	(genRhymeDist, _, _, _) = main.buildModel(generatedText)
+	(genRhymeDist, _, _, _) = model.buildModel(generatedText)
 
 	distance = 0
 	# Iterate through every postition that appears in model 
@@ -159,18 +155,21 @@ def evaluate(generatedText):
 		genDist = genRhymeDist[pos]
 		keySuperSet = set(targetDist.keys()).union(set(genDist.keys()))
 		for key in keySuperSet:
-			distance += (targetDist[key] - genDist[key])^2
+			distance += (targetDist[key] - genDist[key])**2
+
+	numSamples = 2
+	for i in range(numSamples):
+		lineLen = sampleLineLength()
+		# Plot graph of generated rhyme dist and model rhyme dist at pos
+		plotter.evaluationGraph('Chance', genRhymeDist, lineLen)
 
 	return distance
 
 
 loadPickleFiles("Chance")
-print(lineLenDist)
-print(gramDict)
-print(rhymeDist)
-print(rhymingDictionary)
 generatedText = generate()
 print(generatedText)
 distance = evaluate(generatedText)
 print(distance)
+plotter.plot()
 		

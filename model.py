@@ -254,9 +254,9 @@ def processStyle(styleName):
 	pickleFiles(styleName)
 
 # Comment this out when running generation
-processStyle("Chance")
-print("Next style")
-processStyle("Nicki")
+# processStyle("Chance")
+# print("Next style")
+# processStyle("Nicki")
 
 
 
