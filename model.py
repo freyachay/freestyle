@@ -155,7 +155,6 @@ def updateLineDistCounts(line):
 
 # Normalizes lineLenDist based on number of lines
 def normalizeLineDist(lineCount):
-	lineLenDist[0] = 0
 	for length, count in lineLenDist.iteritems():
 		lineLenDist[length] = count/lineCount
 

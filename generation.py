@@ -20,10 +20,19 @@ def dd():
 	return defaultdict(float)
 
 def loadPickleFiles(styleName):
+	global lineLenDist 
+	global gramDict
+	global rhymeDist 
+	global rhymingDictionary
 	lineLenDist = pickle.load(open("lineLenDist" + styleName + ".p", "rb"))
 	gramDict = pickle.load(open("gramDict" + styleName + ".p", "rb"))
 	rhymeDist = pickle.load(open("rhymeDist" + styleName + ".p", "rb"))
 	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + ".p", "rb"))
+
+	print(lineLenDist)
+	print(gramDict)
+	print(rhymeDist)
+	print(rhymingDictionary)
 
 # Uses ngram dict to generate next word
 def generateWord(prev):
@@ -42,7 +51,6 @@ def sampleLineLength():
 		weights.append(v)
 
 	return choice(elements, p=weights)
-
 
 def getPrevTuple(totalPhrase, pos):
 	prevGram = tuple(totalPhrase[(len(totalPhrase) - n + 1):])
@@ -157,6 +165,10 @@ def evaluate(generatedText):
 
 
 loadPickleFiles("Chance")
+print(lineLenDist)
+print(gramDict)
+print(rhymeDist)
+print(rhymingDictionary)
 generatedText = generate()
 print(generatedText)
 distance = evaluate(generatedText)
