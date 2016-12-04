@@ -4,7 +4,7 @@ from collections import defaultdict
 def dd():
 	return defaultdict(float)
 
-styleName = "Nicki"
+styleName = "Chance"
 lineLenDist = pickle.load(open("lineLenDist" + styleName + ".p", "rb"))
 gramDict = pickle.load(open("gramDict" + styleName + ".p", "rb"))
 rhymeDist = pickle.load(open("rhymeDist" + styleName + ".p", "rb"))

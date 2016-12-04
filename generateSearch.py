@@ -10,6 +10,9 @@ corpus = set()
 fluencyWeight = 1
 rhymeWeight = 10
 
+def dd():
+	return defaultdict(float)
+
 def genCorpus(style):
 	global corpus
 	f = open(style.lower() + "Lyrics.txt")
@@ -60,31 +63,30 @@ def costFunction(newState):
 	return cost
 	 
 
-class PhraseGenProblem(util.SearchProblem):
+class PhraseGenProblem(searchUtil.SearchProblem):
     def __init__(self, startGram, costFunction):
         self.startGram = startGram
         self.costFunction = costFunction
 
-    # State = (list of words so far in phrase, number of lines so far, target line length)
+    # State = (tuple of words so far in phrase, number of lines so far, target line length)
     def startState(self):
-        return (list(startGrams), 0, generation.sampleLineLength())
+        return (startGram, 0, generation.sampleLineLength())
 
     # We have generated enough lines for a complete phrase
     def isEnd(self, state):
         return (state[1] == generation.phraseLen)
 
     def succAndCost(self, state):
-    	# List of tuples = (successor state, cost)
         results = []
         (prevPhrase, prevLineCount, targetLineLen) = state
 
         for word in corpus:
-        	succPhrase = prevPhrase.append(word)
+        	succPhrase = prevPhrase + (word,)
         	syllables = model.getSyllables(succPhrase)
 
         	# Add a new line character and get new line length once we've made a line
         	if (syllables >= targetLineLen):
-        		succPhrase.append("\n")
+        		succPhrase += ("\n",)
         		newState = (succPhrase, prevLineCount + 1, generation.sampleLineLength())
         	else:
         		newState = (succPhrase, prevLineCount, targetLineLen)
@@ -98,7 +100,7 @@ class PhraseGenProblem(util.SearchProblem):
 
 # Returns a phrase in the form of a list of words
 def solve(startGram, costFunction):
-    ucs = util.UniformCostSearch(verbose=0)
+    ucs = searchUtil.UniformCostSearch(verbose=0)
     ucs.solve(PhraseGenProblem(startGram, costFunction))
     return ucs.actions
 
@@ -107,10 +109,8 @@ def solve(startGram, costFunction):
 
 # ******* Main ******
 
-
 for style in ["Chance"]:
 	genCorpus(style)
-	print(corpus)
 	generation.loadModel(style)
 
  	totalLyrics = []
@@ -118,13 +118,14 @@ for style in ["Chance"]:
 	startGram = random.choice(generation.gramDict.keys())
 
 	# Generate numPhrases phrases
-	for i in range(numPhrases):
+	for i in range(generation.numPhrases):
 		phrase = solve(startGram, costFunction)
 		totalLyrics += phrase
 
 		# Get new startGram (last gram in previously generated phrase)
 		startGram = generation.getPrevTuple(phrase[:len(phrase)-1])
 
+	# Convert final state tuple to list
 	print(' '.join(totalLyrics))
 
 	# Evaluation
