@@ -48,10 +48,11 @@ def sampleLineLength():
 
 	return choice(elements, p=weights)
 
-def getPrevTuple(totalPhrase, pos):
-	prevGram = tuple(totalPhrase[(len(totalPhrase) - n + 1):])
+# Returns the last tuple in a phrase
+def getPrevTuple(phrase):
+	prevGram = tuple(phrase[(len(totalPhrase) - n + 1):])
 	if prevGram[len(prevGram) - 1] is "\n":
-		return tuple(totalPhrase[(len(totalPhrase) - n): len(totalPhrase) - 1])
+		return tuple(phrase[(len(phrase) - n): len(phrase) - 1])
 	return prevGram
 
 # Takes in a list of pronunciations of a syllable.

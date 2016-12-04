@@ -36,7 +36,7 @@ def generate():
 				# Either we don't need to rhyme or we couldn't find a rhyme
 				if (nextWord is ""):
 					# Generate word from n grams
-					nextWord = generation.generateWord(generation.getPrevTuple(totalPhrase, totalPhraseLength))
+					nextWord = generation.generateWord(generation.getPrevTuple(totalPhrase))
 					while(nextWord is ""):
 						nextWord = generation.generateWord(random.choice(gramDict.keys()))
 

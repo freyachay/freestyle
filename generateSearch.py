@@ -1,8 +1,14 @@
 import generation
 import searchUtil
+import random
 import model
+import plotter
 
 corpus = set()
+
+# For cost function
+fluencyWeight = 1
+rhymeWeight = 10
 
 def genCorpus(style):
 	global corpus
@@ -14,10 +20,47 @@ def genCorpus(style):
 
 # Low fluency (eh) + missed rhyme opportunity (WORSE)
 def costFunction(newState):
+	(totalPhrase, lineCount, targetLineLen) = newState
+	phrase = [w for w in totalPhrase if w is not "\n"] # filter new lines
+	rhymeDist = generation.rhymeDist
+	phraseSyllables = model.getSyllables(phrase)
 
+	newSyllables = model.getSyllables([phrase[len(phrase)-1]])
+
+	# Determines cost of each syllable of new word, end to front
+	cost = 0
+	for i in range(len(newSyllables)):
+		syllable = newSyllables[i]
+		positionDist = rhymeDist[len(phraseSyllables) - 1 - i]
+
+		for pos, prob in positionDist.iteritems():
+			found = False
+			if prob < generation.rhymeThresh: continue
+
+			# We're supposed to rhyme! Did we?
+			targetSyl = phraseSyllables[pos]
+
+			for pron in syllable:
+				for targetPron in targetSyl:
+					if model.sylRhymes(pron, targetPron):
+						found = True
+						break
+				if found: break
+
+			# Cost is proportional to how much you were supposed to rhyme
+			if not found:
+				cost += (prob * rhymeWeight)
+
+	# prevGram is the gram before the word we just added
+	prevGram = getPrevTuple(phrase[:len(phrase)-1])
+	fluentSuccessors = generation.gramDict[prevGram]
+
+	if newWord not in fluentSuccessors:
+		cost += fluencyWeight
+	return cost
 	 
 
-class SegmentationProblem(util.SearchProblem):
+class PhraseGenProblem(util.SearchProblem):
     def __init__(self, startGram, costFunction):
         self.startGram = startGram
         self.costFunction = costFunction
@@ -33,7 +76,7 @@ class SegmentationProblem(util.SearchProblem):
     def succAndCost(self, state):
     	# List of tuples = (successor state, cost)
         results = []
-        (prevPhrase, prevLines, targetLineLen) = state
+        (prevPhrase, prevLineCount, targetLineLen) = state
 
         for word in corpus:
         	succPhrase = prevPhrase.append(word)
@@ -42,38 +85,52 @@ class SegmentationProblem(util.SearchProblem):
         	# Add a new line character and get new line length once we've made a line
         	if (syllables >= targetLineLen):
         		succPhrase.append("\n")
-        		newState = (succPhrase, prevLines + 1, generation.sampleLineLength())
+        		newState = (succPhrase, prevLineCount + 1, generation.sampleLineLength())
         	else:
-        		newState = (succPhrase, prevLines, targetLineLen)
+        		newState = (succPhrase, prevLineCount, targetLineLen)
 
         	results.append(newState, costFunction(newState))
-
         return results
 
 # ************************************
 
 # *********** Solve search problem ******
 
-def solve(startGram, unigramCost):
+# Returns a phrase in the form of a list of words
+def solve(startGram, costFunction):
     ucs = util.UniformCostSearch(verbose=0)
-    ucs.solve(SegmentationProblem(startGram, costFunction))
-    return ' '.join(ucs.actions)
+    ucs.solve(PhraseGenProblem(startGram, costFunction))
+    return ucs.actions
 
 
 # ************************************
 
 # ******* Main ******
 
-for style in ["Chance", "Nicki"]:
+
+for style in ["Chance"]:
 	genCorpus(style)
 	print(corpus)
+	generation.loadModel(style)
 
-	# Run solve numPhrases times
+ 	totalLyrics = []
+	# Choose a random starting gram
+	startGram = random.choice(generation.gramDict.keys())
 
+	# Generate numPhrases phrases
+	for i in range(numPhrases):
+		phrase = solve(startGram, costFunction)
+		totalLyrics += phrase
 
+		# Get new startGram (last gram in previously generated phrase)
+		startGram = generation.getPrevTuple(phrase[:len(phrase)-1])
 
+	print(' '.join(totalLyrics))
 
+	# Evaluation
+	distance = generation.evaluate(style, totalLyrics)
+	print(distance)
+	print("\n")
 
-
-
+plotter.plot()
 
