@@ -5,11 +5,14 @@ import model
 import plotter
 from collections import defaultdict
 
+
 corpus = set()
 
 # For cost function
 fluencyWeight = 1
 rhymeWeight = 10
+
+pruningConstant = 5
 
 def dd():
 	return defaultdict(float)
@@ -73,14 +76,14 @@ class PhraseGenProblem(searchUtil.SearchProblem):
 
     # State = (tuple of words so far in phrase, number of lines so far, target line length)
     def startState(self):
-        return (startGram, 0, generation.sampleLineLength())
+        return (self.startGram, 0, generation.sampleLineLength())
 
     # We have generated enough lines for a complete phrase
     def isEnd(self, state):
         return (state[1] == generation.phraseLen)
 
     def succAndCost(self, state):
-    	print(state)
+    	print(".")
         results = []
         (prevPhrase, prevLineCount, targetLineLen) = state
 
@@ -88,7 +91,6 @@ class PhraseGenProblem(searchUtil.SearchProblem):
         for word in generation.gramDict[generation.getPrevTuple(prevPhrase)]:
         	# Ignore words that we don't have pronunciations for
         	if len(model.getSyllables([word])) is 0: 
-        		print("Don't have pronunciation")
         		continue
 
         	succPhrase = prevPhrase + (word,)
@@ -97,23 +99,23 @@ class PhraseGenProblem(searchUtil.SearchProblem):
         	# Add a new line character and get new line length once we've made a line
         	if (len(syllables) >= targetLineLen):
         		word = word + "\n"
-        		newState = (succPhrase, prevLineCount + 1, lineLens[prevLineCount + 1])
+        		newState = (succPhrase, prevLineCount + 1, self.lineLens[prevLineCount + 1])
         	else:
         		newState = (succPhrase, prevLineCount, targetLineLen)
+        	results.append((word, newState, self.costFunction(newState)))
 
-        	results.append((word, newState, costFunction(newState)))
-        print(results)
-        print("\n")
-        return results
+        # Only return the 5 lowest cost successors
+        prunedResults = (sorted(results, key=lambda tup: tup[2]))[0:pruningConstant]
+        return prunedResults
 
 # ************************************
 
 # *********** Solve search problem ******
 
 # Returns a phrase in the form of a list of words
-def solve(startGram, costFunction):
+def solve(startGram, lineLens, costFunction):
     ucs = searchUtil.UniformCostSearch(verbose=0)
-    ucs.solve(PhraseGenProblem(startGram, costFunction))
+    ucs.solve(PhraseGenProblem(startGram, lineLens, costFunction))
     return ucs.actions
 
 
@@ -132,7 +134,8 @@ for style in ["Chance"]:
 	# Generate numPhrases phrases
 	for i in range(generation.numPhrases):
 		# -1 represents when we've generated enough lines
-		lineLens = [generation.sampleLineLength() for i in range(phraseLen)].append(-1)
+		lineLens = [generation.sampleLineLength() for i in range(model.phraseLen)]
+		lineLens.append(-1)
 		phrase = solve(startGram, lineLens, costFunction)
 		totalLyrics += phrase
 
