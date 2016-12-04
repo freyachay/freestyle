@@ -27,7 +27,8 @@ def loadModel(style):
 
 # Generate Line Length Distribution graph
 def lineLenDistGraph(style):
-	loadModel(style)	
+	loadModel(style)
+	lineLenDist[0] = 0	
 	plt.figure("Lines")
 	x = []
 	y = []
@@ -63,7 +64,7 @@ def evaluationGraph(targetStyle, genRhymeDist, rhymePos):
 def plot():
 	plt.show()
 
-# loadModel('Chance')
-# lineLenDist()
-# rhymeDistGraph(14)
-# plt.show()
+# loadModel('Nicki')
+# lineLenDistGraph('Nicki')
+# rhymeDistGraph(rhymeDist, 14)
+# plot()
