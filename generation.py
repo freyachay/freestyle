@@ -50,7 +50,7 @@ def sampleLineLength():
 
 # Returns the last tuple in a phrase
 def getPrevTuple(phrase):
-	prevGram = tuple(phrase[(len(totalPhrase) - n + 1):])
+	prevGram = tuple(phrase[(len(phrase) - n + 1):])
 	if prevGram[len(prevGram) - 1] is "\n":
 		return tuple(phrase[(len(phrase) - n): len(phrase) - 1])
 	return prevGram

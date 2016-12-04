@@ -3,6 +3,7 @@ import searchUtil
 import random
 import model
 import plotter
+from collections import defaultdict
 
 corpus = set()
 
@@ -24,11 +25,12 @@ def genCorpus(style):
 # Low fluency (eh) + missed rhyme opportunity (WORSE)
 def costFunction(newState):
 	(totalPhrase, lineCount, targetLineLen) = newState
-	phrase = [w for w in totalPhrase if w is not "\n"] # filter new lines
+	phrase = [w.replace("\n", "") for w in totalPhrase] # filter new lines from words
 	rhymeDist = generation.rhymeDist
 	phraseSyllables = model.getSyllables(phrase)
 
-	newSyllables = model.getSyllables([phrase[len(phrase)-1]])
+	newWord = phrase[len(phrase)-1]
+	newSyllables = model.getSyllables([newWord])
 
 	# Determines cost of each syllable of new word, end to front
 	cost = 0
@@ -55,17 +57,18 @@ def costFunction(newState):
 				cost += (prob * rhymeWeight)
 
 	# prevGram is the gram before the word we just added
-	prevGram = getPrevTuple(phrase[:len(phrase)-1])
-	fluentSuccessors = generation.gramDict[prevGram]
+	# prevGram = generation.getPrevTuple(phrase[:len(phrase)-1])
+	# fluentSuccessors = generation.gramDict[prevGram]
 
-	if newWord not in fluentSuccessors:
-		cost += fluencyWeight
+	# if newWord not in fluentSuccessors:
+	# 	cost += fluencyWeight
 	return cost
 	 
 
 class PhraseGenProblem(searchUtil.SearchProblem):
-    def __init__(self, startGram, costFunction):
+    def __init__(self, startGram, lineLens, costFunction):
         self.startGram = startGram
+        self.lineLens = lineLens
         self.costFunction = costFunction
 
     # State = (tuple of words so far in phrase, number of lines so far, target line length)
@@ -77,21 +80,30 @@ class PhraseGenProblem(searchUtil.SearchProblem):
         return (state[1] == generation.phraseLen)
 
     def succAndCost(self, state):
+    	print(state)
         results = []
         (prevPhrase, prevLineCount, targetLineLen) = state
 
-        for word in corpus:
+        # Iterate through fluent words
+        for word in generation.gramDict[generation.getPrevTuple(prevPhrase)]:
+        	# Ignore words that we don't have pronunciations for
+        	if len(model.getSyllables([word])) is 0: 
+        		print("Don't have pronunciation")
+        		continue
+
         	succPhrase = prevPhrase + (word,)
-        	syllables = model.getSyllables(succPhrase)
+        	syllables = model.getSyllables(list(succPhrase))
 
         	# Add a new line character and get new line length once we've made a line
-        	if (syllables >= targetLineLen):
-        		succPhrase += ("\n",)
-        		newState = (succPhrase, prevLineCount + 1, generation.sampleLineLength())
+        	if (len(syllables) >= targetLineLen):
+        		word = word + "\n"
+        		newState = (succPhrase, prevLineCount + 1, lineLens[prevLineCount + 1])
         	else:
         		newState = (succPhrase, prevLineCount, targetLineLen)
 
-        	results.append(newState, costFunction(newState))
+        	results.append((word, newState, costFunction(newState)))
+        print(results)
+        print("\n")
         return results
 
 # ************************************
@@ -119,7 +131,9 @@ for style in ["Chance"]:
 
 	# Generate numPhrases phrases
 	for i in range(generation.numPhrases):
-		phrase = solve(startGram, costFunction)
+		# -1 represents when we've generated enough lines
+		lineLens = [generation.sampleLineLength() for i in range(phraseLen)].append(-1)
+		phrase = solve(startGram, lineLens, costFunction)
 		totalLyrics += phrase
 
 		# Get new startGram (last gram in previously generated phrase)
@@ -129,7 +143,7 @@ for style in ["Chance"]:
 	print(' '.join(totalLyrics))
 
 	# Evaluation
-	distance = generation.evaluate(style, totalLyrics)
+	distance = generation.evaluate(style, ' '.join(totalLyrics))
 	print(distance)
 	print("\n")
 
