@@ -15,7 +15,7 @@ boringWords = ["the","be","to","of","and","a","in","that","have", \
 				"at","this","but","his","by","from","they","we","say", \
 				"her","she","or","an","will","my","one","all","there", \
 				"their","what","so","who","if","them","yeah"]
-vowelPhenomes = ['AA', 'AE', 'AH', 'AO', 'AW', 'AY', 'EH', 'EY', 'OW', 'IH', 'IY', 'OY', 'UH', 'UW']
+vowelPhenomes = ['AA', 'AE', 'AH', 'AO', 'AW', 'AY', 'EH', 'EY', 'ER', 'OW', 'IH', 'IY', 'OY', 'UH', 'UW']
 n = constants.n
 phraseLen = constants.phraseLen
 
@@ -47,7 +47,7 @@ def processPhrase(phrase):
 # If there's a digit at the end, remove it
 def minusDigit(string):
 	if string[len(string)-1].isdigit():
-		return string[:len(string)]
+		return string[:len(string) - 1]
 	return string
 
 # Returns true of string contains a digit (useful for identifying stressed sounds)
@@ -111,6 +111,9 @@ def getSyllables(phrase):
 					localSylIndex += 1
 					currentSyl = []
 
+			if len(syllables) is 0:
+				continue
+			# Append trailing things
 			if currentSyl is not []:
 				lastSyl = syllables[localSylIndex - 1]
 				lastPron = lastSyl[len(lastSyl)-1]
@@ -219,15 +222,11 @@ def buildGramDict(contents):
 def buildRhymingDict(contents):
 	words = processPhrase(contents)
 	for word in words:
-		print(word)
 		if word in boringWords: continue
 		syllables = getSyllables([word])
-		print(syllables)
 		for pron in syllables[0]:
 			key = ""
 			# Get stressed syllable and suffix from syl1
-			print(pron)
-			print("\n")
 			stressed = [s for s in pron if minusDigit(s) in vowelPhenomes][0] # We know there will only be one stressed syl
 			stressIndex = pron.index(stressed)
 			suffix = pron[stressIndex + 1:]
@@ -281,8 +280,8 @@ def processStyle(styleName):
 
 
 # ### Comment out for importing to generation
-for styleName in constants.styleNames:
-	processStyle(styleName)
+# for styleName in constants.styleNames:
+# 	processStyle(styleName)
 
 
 
