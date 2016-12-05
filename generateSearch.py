@@ -136,19 +136,23 @@ for style in constants.styleNames:
 	for i in range(generation.numPhrases):
 		# -1 represents when we've generated enough lines
 		# lineLens = [generation.sampleLineLength() for i in range(model.phraseLen)]
-		lineLens = [generation.sampleLineLength()]
+		lineLen = generation.sampleLineLength()
+		while lineLen > 12:
+			lineLen = generation.sampleLineLength()
+		lineLens = [lineLen]
 		# lineLens.append(-1)
 		phrase = solve(startGram, lineLens, costFunction)
 		print(phrase)
 		totalLyrics += ' '.join(phrase)
 
 		# Get new startGram (last gram in previously generated phrase)
-		startGram = generation.getPrevTuple(phrase[:len(phrase)-1])
+		# startGram = generation.getPrevTuple(phrase[:len(phrase)-1])
+		startGram = random.choice(generation.gramDict.keys())
 
 	print(''.join(totalLyrics))
 
 	# Evaluation
-	distance = generation.evaluate(style, ' '.join(totalLyrics), False)
+	distance = generation.evaluate(style, ' '.join(totalLyrics), True)
 	print(distance)
 	print("\n")
 

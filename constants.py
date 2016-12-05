@@ -8,10 +8,10 @@ n = 2
 phraseLen = 1
 
 # Number of phrases to generate (used in generation)
-numPhrases = 2
+numPhrases = 10
 
 # How probable must a rhyme be to count as needing to rhyme? (used in generation)
-rhymeThresh = 0.05 
+rhymeThresh = 0.01
 
 # Constants for generation by search
 rhymeWeight = 10
