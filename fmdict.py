@@ -144,5 +144,8 @@ extraDict = {"prob'ly":['P R AA1', 'B L IY0'],
           "rochambeau": ["R OW1","SH AE0 M","B OW2"],
           "ingenuitive": ["IH0 N","JH AH0","N UW1","AH0","T IH0 V"],
           "outplanned": ["AW0 T","P L AE1 N D"],
-          "giddyup": ["G IH1","D IY0","AH2 P"]
+          "giddyup": ["G IH1","D IY0","AH2 P"],
+
+          "kanye": ["K AA1 N", "Y EY0"]
+
          }
