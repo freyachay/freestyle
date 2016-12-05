@@ -2,6 +2,7 @@ import pickle
 import random
 import model
 import plotter
+import constants
 from numpy.random import choice
 from collections import defaultdict
 
@@ -12,10 +13,10 @@ rhymeDist = None
 rhymingDictionary = None
 
 # Number of phrases to generate
-n = model.n
-phraseLen = model.phraseLen
-numPhrases = 1
-rhymeThresh = 0.01
+n = constants.n
+phraseLen = constants.phraseLen
+numPhrases = constants.numPhrases
+rhymeThresh = constants.rhymeThresh
 
 def dd():
 	return defaultdict(float)
@@ -103,7 +104,7 @@ def sampleRhymeDist(currentPhrase, pos):
 # Takes in a generatedText, generates a model based on the generated text,
 # and returns the distance squared between the rhyme distribution of the 
 # generated model and target model 
-def evaluate(targetStyle, generatedText):
+def evaluate(targetStyle, generatedText, plot):
 	# Create genModel: i.e. the model of our generated text
 	(genRhymeDist, _, _, _) = model.buildModel(generatedText)
 
@@ -115,11 +116,12 @@ def evaluate(targetStyle, generatedText):
 		for key in keySuperSet:
 			distance += (targetDist[key] - genDist[key])**2
 
-	numSamples = 2
-	for i in range(numSamples):
-		lineLen = sampleLineLength()
-		# Plot graph of generated rhyme dist and model rhyme dist at pos
-		plotter.evaluationGraph(targetStyle, genRhymeDist, lineLen)
+	# numSamples = 2
+	if plot:
+		for i in range(5, 20):
+			lineLen = sampleLineLength()
+			# Plot graph of generated rhyme dist and model rhyme dist at pos
+			plotter.evaluationGraph(targetStyle, genRhymeDist, lineLen)
 
 	return distance
 		

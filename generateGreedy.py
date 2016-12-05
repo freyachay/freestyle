@@ -2,7 +2,12 @@ import generation
 import plotter
 import model
 import random
+import constants
 from collections import defaultdict
+
+numPhrases = constants.numPhrases
+phraseLen = constants.phraseLen
+
 
 def dd():
 	return defaultdict(float)
@@ -25,8 +30,8 @@ def generate():
 	currentLineLength = len(model.getSyllables(currentPhrase))
 	totalPhraseLength = len(model.getSyllables(currentPhrase))
 
-	for _ in range(generation.numPhrases):
-		for _ in range(generation.phraseLen):
+	for _ in range(numPhrases):
+		for _ in range(phraseLen):
 			targetLineLength = generation.sampleLineLength()
 			# Generate line
 			while (currentLineLength < targetLineLength):
@@ -45,6 +50,7 @@ def generate():
 				currentLineLength += len(model.getSyllables([nextWord]))
 				currentPhraseLength += len(model.getSyllables([nextWord]))
 				totalPhraseLength += len(model.getSyllables([nextWord]))
+			print(len(model.getSyllables(currentPhrase)))
 			currentPhrase.append("\n")
 			totalPhrase.append("\n")
 			currentLineLength = 0
@@ -55,11 +61,11 @@ def generate():
 
 # ******* Main **********
 
-for style in ["Chance", "Nicki"]:
+for style in constants.styleNames:
 	generation.loadModel(style)
 	generatedText = generate()
 	print(generatedText)
-	distance = generation.evaluate(style, generatedText)
+	distance = generation.evaluate(style, generatedText, false)
 	print(distance)
 	print("\n")
 

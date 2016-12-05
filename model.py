@@ -1,13 +1,13 @@
 import nltk
 import fmdict
 import pickle
+import constants
 from collections import defaultdict
 from nltk.util import ngrams
 from nltk.corpus import cmudict
 from nltk.tokenize import word_tokenize, wordpunct_tokenize, sent_tokenize, RegexpTokenizer
 
 # Global variables
-sentence = "Hey there \n bear the be this care \n Yes \n I am a care bear mess all guy sky"
 mainDict = cmudict.dict()
 extraDict = fmdict.extraDict
 boringWords = ["the","be","to","of","and","a","in","that","have", \
@@ -16,8 +16,8 @@ boringWords = ["the","be","to","of","and","a","in","that","have", \
 				"her","she","or","an","will","my","one","all","there", \
 				"their","what","so","who","if","them","yeah"]
 
-n = 2
-phraseLen = 2
+n = constants.n
+phraseLen = constants.phraseLen
 
 # These will be populated after running
 def dd():
@@ -240,10 +240,10 @@ def buildModel(contents):
 	return (rhymeDist, lineLenDist, gramDict, rhymingDictionary)
 
 def pickleFiles(styleName):
-	pickle.dump(rhymeDist, open("rhymeDist" + styleName + ".p", "wb"))
-	pickle.dump(lineLenDist, open("lineLenDist" + styleName + ".p", "wb"))
-	pickle.dump(gramDict, open("gramDict" + styleName + ".p", "wb"))
-	pickle.dump(rhymingDictionary, open("rhymingDictionary" + styleName + ".p", "wb"))
+	pickle.dump(rhymeDist, open("rhymeDist" + styleName + "_"+ str(phraseLen) + ".p", "wb"))
+	pickle.dump(lineLenDist, open("lineLenDist" + styleName + "_"+ str(phraseLen) + ".p", "wb"))
+	pickle.dump(gramDict, open("gramDict" + styleName + "_"+ str(phraseLen) + ".p", "wb"))
+	pickle.dump(rhymingDictionary, open("rhymingDictionary" + styleName + "_"+ str(phraseLen) + ".p", "wb"))
 
 def processStyle(styleName):
 	f = open(styleName.lower() + "Lyrics.txt")
@@ -251,10 +251,11 @@ def processStyle(styleName):
 	buildModel(contents)
 	pickleFiles(styleName)
 
-# Comment this out when running generation
-# processStyle("Chance")
-# print("Next style")
-# processStyle("Nicki")
+
+# ### Comment out for importing to generation
+# for styleName in constants.styleNames:
+# 	processStyle(styleName)
+
 
 
 
