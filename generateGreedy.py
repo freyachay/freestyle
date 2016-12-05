@@ -50,7 +50,6 @@ def generate():
 				currentLineLength += len(model.getSyllables([nextWord]))
 				currentPhraseLength += len(model.getSyllables([nextWord]))
 				totalPhraseLength += len(model.getSyllables([nextWord]))
-			print(len(model.getSyllables(currentPhrase)))
 			currentPhrase.append("\n")
 			totalPhrase.append("\n")
 			currentLineLength = 0
@@ -65,7 +64,7 @@ for style in constants.styleNames:
 	generation.loadModel(style)
 	generatedText = generate()
 	print(generatedText)
-	distance = generation.evaluate(style, generatedText, false)
+	distance = generation.evaluate(style, generatedText, True)
 	print(distance)
 	print("\n")
 
