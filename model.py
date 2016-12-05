@@ -62,7 +62,17 @@ def getPron(word):
 	# print(word)
 	return None
 
-# This takes in a phrase (list of words) and returns a list of syllables made up of sounds.
+# Takes in a list of syllables, returns list of list of sounds
+def extraConvert(extraPron):
+	converted = []
+	for syl in extraPron:
+		sounds = syl.split()
+		converted.append(sounds)
+	return converted
+
+
+# This takes in a phrase (list of words) and returns a dictionary of syllables made up of sounds
+# For extra dict words: ["F AH1", "K ER0"] --> {0: [['f', 'ah1']], 1: [['k', 'er0']]}
 def getSyllables(phrase):
 	syllables = defaultdict(list)
 	currentSyl = []
@@ -71,6 +81,15 @@ def getSyllables(phrase):
 	globalSylIndex = 0
 	localSylIndex = 0
 	for word in phrase:
+		print(word)
+		# Check extra dictionary, store in syllables
+		if word.lower() in extraDict.keys():
+			extraSylls = extraDict[word.lower()]
+			converted = extraConvert(extraSylls)
+			for i in range(len(converted)):
+				syllables[globalSylIndex + i].append(converted[i])
+			continue
+
 		possibleProns = getPron(word)
 		if possibleProns is None: continue
 
@@ -86,6 +105,7 @@ def getSyllables(phrase):
 
 					localSylIndex += 1
 					currentSyl = []
+			print(syllables)
 
 			if currentSyl is not []:
 				lastSyl = syllables[localSylIndex - 1]
@@ -253,8 +273,8 @@ def processStyle(styleName):
 
 
 # ### Comment out for importing to generation
-# for styleName in constants.styleNames:
-# 	processStyle(styleName)
+for styleName in constants.styleNames:
+	processStyle(styleName)
 
 
 
