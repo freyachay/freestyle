@@ -26,10 +26,10 @@ def loadModel(styleName):
 	global gramDict
 	global rhymeDist 
 	global rhymingDictionary
-	lineLenDist = pickle.load(open("lineLenDist" + styleName + ".p", "rb"))
-	gramDict = pickle.load(open("gramDict" + styleName + ".p", "rb"))
-	rhymeDist = pickle.load(open("rhymeDist" + styleName + ".p", "rb"))
-	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + ".p", "rb"))
+	lineLenDist = pickle.load(open("lineLenDist" + styleName + "_4.p", "rb"))
+	gramDict = pickle.load(open("gramDict" + styleName + "_4.p", "rb"))
+	rhymeDist = pickle.load(open("rhymeDist" + styleName + "_4.p", "rb"))
+	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + "_4.p", "rb"))
 
 # Uses ngram dict to generate next word
 def generateWord(prev):
