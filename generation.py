@@ -63,7 +63,7 @@ def findRhyme(sylProns):
 
 	# Try all pronunciations of syl
 	for pron in sylProns:
-		stressed = [s for s in pron if model.containsDigit(s)][0]
+		stressed = [s for s in pron if model.minusDigit(s) in model.vowelPhenomes][0]
 		stressIndex = pron.index(stressed)
 		suffix = pron[stressIndex + 1:]
 		key = stressed + ''.join(suffix)

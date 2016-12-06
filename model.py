@@ -15,7 +15,7 @@ boringWords = ["the","be","to","of","and","a","in","that","have", \
 				"at","this","but","his","by","from","they","we","say", \
 				"her","she","or","an","will","my","one","all","there", \
 				"their","what","so","who","if","them","yeah"]
-
+vowelPhenomes = ['AA', 'AE', 'AH', 'AO', 'AW', 'AY', 'EH', 'EY', 'ER', 'OW', 'IH', 'IY', 'OY', 'UH', 'UW']
 n = constants.n
 phraseLen = constants.phraseLen
 
@@ -44,9 +44,15 @@ def processPhrase(phrase):
 
 # ************* Rhyme distribution ************
 
+# If there's a digit at the end, remove it
+def minusDigit(string):
+	if string[len(string)-1].isdigit():
+		return string[:len(string) - 1]
+	return string
+
 # Returns true of string contains a digit (useful for identifying stressed sounds)
-def containsDigit(string):
-	return any(char.isdigit() for char in string)
+# def containsDigit(string):
+# 	return any(char.isdigit() for char in string)
 
 # Takes in a word. Looks it up in either extraDict or mainDict and returns list of pronunciations
 # (list of lists of sounds)
@@ -62,7 +68,17 @@ def getPron(word):
 	# print(word)
 	return None
 
-# This takes in a phrase (list of words) and returns a list of syllables made up of sounds.
+# Takes in a list of syllables, returns list of list of sounds
+def extraConvert(extraPron):
+	converted = []
+	for syl in extraPron:
+		sounds = syl.split()
+		converted.append(sounds)
+	return converted
+
+
+# This takes in a phrase (list of words) and returns a dictionary of syllables made up of sounds
+# For extra dict words: ["F AH1", "K ER0"] --> {0: [['f', 'ah1']], 1: [['k', 'er0']]}
 def getSyllables(phrase):
 	syllables = defaultdict(list)
 	currentSyl = []
@@ -71,6 +87,14 @@ def getSyllables(phrase):
 	globalSylIndex = 0
 	localSylIndex = 0
 	for word in phrase:
+		# Check extra dictionary, store in syllables
+		if word.lower() in extraDict.keys():
+			extraSylls = extraDict[word.lower()]
+			converted = extraConvert(extraSylls)
+			for i in range(len(converted)):
+				syllables[globalSylIndex + i].append(converted[i])
+			continue
+
 		possibleProns = getPron(word)
 		if possibleProns is None: continue
 
@@ -78,7 +102,7 @@ def getSyllables(phrase):
 			localSylIndex = globalSylIndex	
 			for sound in pronunciation:
 				currentSyl.append(sound)
-				if (containsDigit(sound)):
+				if (minusDigit(sound) in vowelPhenomes):
 					prev = syllables[localSylIndex]
 					if currentSyl not in prev:
 						prev.append(currentSyl)
@@ -87,6 +111,9 @@ def getSyllables(phrase):
 					localSylIndex += 1
 					currentSyl = []
 
+			if len(syllables) is 0:
+				continue
+			# Append trailing things
 			if currentSyl is not []:
 				lastSyl = syllables[localSylIndex - 1]
 				lastPron = lastSyl[len(lastSyl)-1]
@@ -108,12 +135,12 @@ def sylRhymes(syl1, syl2):
 	if (syl1 == syl2): return False
 
 	# Get stressed syllable and suffix from syl1
-	stressed1 = [s for s in syl1 if containsDigit(s)][0] # We know there will only be one stressed syl
+	stressed1 = [s for s in syl1 if minusDigit(s) in vowelPhenomes][0] # We know there will only be one stressed syl
 	stressIndex1 = syl1.index(stressed1)
 	suffix1 = syl1[stressIndex1 + 1:]
 
 	# Same for syl2
-	stressed2 = [s for s in syl2 if containsDigit(s)][0] # We know there will only be one stressed syl
+	stressed2 = [s for s in syl2 if minusDigit(s) in vowelPhenomes][0] # We know there will only be one stressed syl
 	stressIndex2 = syl2.index(stressed2)
 	suffix2 = syl2[stressIndex2 + 1:]
 
@@ -200,7 +227,7 @@ def buildRhymingDict(contents):
 		for pron in syllables[0]:
 			key = ""
 			# Get stressed syllable and suffix from syl1
-			stressed = [s for s in pron if containsDigit(s)][0] # We know there will only be one stressed syl
+			stressed = [s for s in pron if minusDigit(s) in vowelPhenomes][0] # We know there will only be one stressed syl
 			stressIndex = pron.index(stressed)
 			suffix = pron[stressIndex + 1:]
 			key = stressed + ''.join(suffix)
