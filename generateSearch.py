@@ -81,7 +81,7 @@ class PhraseGenProblem(searchUtil.SearchProblem):
         (prevPhrase, prevLineCount, targetLineLen) = state
 
         # Iterate through fluent words
-        for word in generation.gramDict[generation.getPrevTuple(prevPhrase)]:
+        for word in generation.gramDict[generation.getPrevTuple(prevPhrase)].keys():
         	# Ignore words that we don't have pronunciations for
         	if len(model.getSyllables([word])) is 0: 
         		continue
@@ -152,8 +152,9 @@ for style in constants.styleNames:
 	print(''.join(totalLyrics))
 
 	# Evaluation
-	distance = generation.evaluate(style, ' '.join(totalLyrics), True)
-	print(distance)
+	distance, fluencyScore = generation.evaluate(style, ' '.join(totalLyrics), True)
+	print("Distance: {}".format(distance))
+	print("Fluency: {}".format(fluencyScore))
 	print("\n")
 
 plotter.plot()

@@ -8,16 +8,14 @@ styleNames = ['Hamilton']
 n = 2
 
 # Number of lines per phrase (used in model and generation)
-phraseLen = 4
+phraseLen = 2
 
 # Number of phrases to generate (used in generation)
 numPhrases = 1
 
 # How probable must a rhyme be to count as needing to rhyme? (used in generation)
-rhymeThresh = 0.01
-
-# How probable must a rhyme be to count as needing to rhyme? (used in generation)
 rhymeThresh = 0.05
+
 
 
 

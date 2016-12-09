@@ -26,17 +26,23 @@ def loadModel(styleName):
 	global gramDict
 	global rhymeDist 
 	global rhymingDictionary
-	lineLenDist = pickle.load(open("lineLenDist" + styleName + "_4.p", "rb"))
-	gramDict = pickle.load(open("gramDict" + styleName + "_4.p", "rb"))
-	rhymeDist = pickle.load(open("rhymeDist" + styleName + "_4.p", "rb"))
-	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + "_4.p", "rb"))
+	lineLenDist = pickle.load(open("lineLenDist" + styleName + "_" + str(phraseLen) + ".p", "rb"))
+	gramDict = pickle.load(open("gramDict" + styleName + "_" + str(phraseLen) + ".p", "rb"))
+	rhymeDist = pickle.load(open("rhymeDist" + styleName + "_" + str(phraseLen) + ".p", "rb"))
+	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + "_" + str(phraseLen) + ".p", "rb"))
 
 # Uses ngram dict to generate next word
 def generateWord(prev):
-	if len(gramDict[prev]) is 0:
-		return ""
-	return random.choice(gramDict[prev])
+	if len(gramDict[prev].keys()) is 0: return ""
 
+	elements = []
+	weights = []
+
+	for k, v in gramDict[prev].iteritems():
+		elements.append(k)
+		weights.append(v)
+
+	return choice(elements, p=weights)
 
 # Returns a number of syllables for a line
 def sampleLineLength():
@@ -124,18 +130,19 @@ def evaluate(targetStyle, generatedText, plot):
 			plotter.evaluationGraph(targetStyle, genRhymeDist, lineLen)
 
 	# Evaluate fluency
-	
+	fluencyScore = 0
+	for gram in model.generateGrams(generatedText.split()):
+		key = tuple(gram.split()[:n-1])
+		successor = gram.split()[n-1]
+		fluencyScore += gramDict[key][successor]
 
-	return distance
-
-
-
-
-
-
+	return (distance, fluencyScore/len(generatedText.split()))
 
 
 
 
-	
+
+
+
+
 		

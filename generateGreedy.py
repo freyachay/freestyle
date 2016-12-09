@@ -64,8 +64,9 @@ for style in constants.styleNames:
 	generation.loadModel(style)
 	generatedText = generate()
 	print(generatedText)
-	distance = generation.evaluate(style, generatedText, False)
-	print(distance)
+	distance, fluencyScore = generation.evaluate(style, generatedText, False)
+	print("Distance: {}".format(distance))
+	print("Fluency: {}".format(fluencyScore))
 	print("\n")
 
 plotter.plot()

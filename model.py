@@ -25,7 +25,7 @@ def dd():
 
 rhymeDist = defaultdict(dd)
 lineLenDist = defaultdict(float)
-gramDict = defaultdict(list)
+gramDict = defaultdict(dd)
 rhymingDictionary = defaultdict(set)
 
 # ************* Helpers ***********
@@ -192,7 +192,7 @@ def normalizeLineDist(lineCount):
 # ***** N-grams ******
 
 # Takes in a list of words, returns a list of n-grams
-def generate_grams(words):
+def generateGrams(words):
     gramList = []
     for ngram in ngrams(words, n):
         gramList.append(' '.join(str(i) for i in ngram))
@@ -200,14 +200,25 @@ def generate_grams(words):
 
 # Creates list of n-grams from text (contents), updates dictionary mapping n-grams to successor words
 def buildGramDict(contents):
-	grams = generate_grams(processPhrase(contents))
+	grams = generateGrams(processPhrase(contents))
 	for gram in grams:
 		words = gram.split()
 		key = ()
 		for i in range(n-1):
 			key = key + (words[i],)
 
-		gramDict[key].append(words[n-1])
+		value = gramDict[key] # Dictionary mapping successors --> probabability
+		successor = words[n-1]
+		value[successor] += 1
+		gramDict[key] = value
+
+	# Normalize
+	for gram, succDict in gramDict.iteritems():
+		totalCount = 0
+		for word, count in succDict.iteritems():
+			totalCount += count
+		for word, count in succDict.iteritems():
+			gramDict[gram][word] = count/totalCount
 
 # ************************
 
