@@ -123,5 +123,19 @@ def evaluate(targetStyle, generatedText, plot):
 			# Plot graph of generated rhyme dist and model rhyme dist at pos
 			plotter.evaluationGraph(targetStyle, genRhymeDist, lineLen)
 
+	# Evaluate fluency
+	
+
 	return distance
+
+
+
+
+
+
+
+
+
+
+	
 		

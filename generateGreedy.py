@@ -64,7 +64,7 @@ for style in constants.styleNames:
 	generation.loadModel(style)
 	generatedText = generate()
 	print(generatedText)
-	distance = generation.evaluate(style, generatedText, True)
+	distance = generation.evaluate(style, generatedText, False)
 	print(distance)
 	print("\n")
 
