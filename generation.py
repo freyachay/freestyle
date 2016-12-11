@@ -87,22 +87,14 @@ def findRhyme(sylProns):
 	# No rhymes found for any pronunciation
 	return ""
 
-# Takes in a position, checks rhymeDist, looks for a word that starts with rhyme target (in order of
-# rhyme target probability)
-def sampleRhymeDist(currentPhrase, pos):
-	# Sorted rhyme targets sorted by probability
-	targets = rhymeDist[pos]
-	if len(targets) is 0: return ""
-
-	# Eliminate targets below probability threshold
-	filteredTargets = [i for i in targets.keys() if targets[i] > rhymeThresh]
-
-	sortedTargets = sorted(targets, key=targets.get, reverse = True)
-	finalTargets = [t for t in sortedTargets if t in filteredTargets]
-
+# Takes in a current position to be filled, 
+# looks for a word that rhymes with one of the rhyme targets specified by 
+# position in rhymePos (rhymePos expected to be sorted)
+def getRhymingWord(currentPhrase, pos, rhymePos):
 	phraseSyllables = model.getSyllables(currentPhrase)
-	for target in finalTargets:
-		rhymeWord = findRhyme(phraseSyllables[target])
+	for i in range(rhymePos.index(pos)):
+		targetPos = rhymePos[i]
+		rhymeWord = findRhyme(phraseSyllables[targetPos])
 		if rhymeWord is not "":
 			return rhymeWord
 	return ""

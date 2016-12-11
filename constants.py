@@ -18,8 +18,6 @@ rhymeThresh = 0.05
 
 
 
-
-
 # ********** Search
 
 # # For gram model (used in model and generation)
