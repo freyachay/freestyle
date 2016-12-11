@@ -9,7 +9,7 @@ from collections import defaultdict
 
 corpus = set()
 
-# For cost function
+# **** For cost function
 rhymeWeight = constants.rhymeWeight
 pruningConstant = constants.pruningConstant
 
@@ -24,42 +24,54 @@ def genCorpus(style):
 
 # ********* Creating search problem *********
 
-# Low fluency (eh) + missed rhyme opportunity (WORSE)
-def costFunction(newState):
-	(totalPhrase, lineCount, targetLineLen) = newState
-	phrase = [w.replace("\n", "") for w in totalPhrase] # filter new lines from words
-	rhymeDist = generation.rhymeDist
-	phraseSyllables = model.getSyllables(phrase)
+def costFunction(totalPhrase):
+# def costFunction(newState):
+	# This is important
+	#(totalPhrase, _ , _) = newState
+	#phrase = [w.replace("\n", "") for w in totalPhrase] # filter new lines from words
+	#rhymeDist = generation.rhymeDist
 
+	# Testing
+	rhymeDist = {4: {0: 0.7, 1: 0.2, 2: 0.1, 3:0}, 5: {0: 0.1, 1: 0.8, 2: 0.1, 3:0, 4:0}}
+	phrase = totalPhrase
 	newWord = phrase[len(phrase)-1]
 	newSyllables = model.getSyllables([newWord])
+	oldSyllables = model.getSyllables(phrase[:len(phrase)-1])
 
-	# Determines cost of each syllable of new word, end to front
 	cost = 0
+	skip = False
 	for i in range(len(newSyllables)):
-		syllable = newSyllables[i]
-		positionDist = rhymeDist[len(phraseSyllables) - 1 - i]
-
-		for pos, prob in positionDist.iteritems():
+		currSyl = newSyllables[i]
+		sylCost = 0
+		
+		for j in range(len(oldSyllables)):
 			found = False
-			if prob < generation.rhymeThresh: continue
+			if skip:  # Polysyllabic rhymes
+				skip = False
+				continue
 
-			# We're supposed to rhyme! Did we?
-			targetSyl = phraseSyllables[pos]
-
-			for pron in syllable:
-				for targetPron in targetSyl:
+			prevSyl = oldSyllables[j]
+			for pron in currSyl:
+				for targetPron in prevSyl:
 					if model.sylRhymes(pron, targetPron):
 						found = True
+
+						# Check trailing syllable (if available)
+						if (i is not len(newSyllables)-1) and (j is not len(oldSyllables)-1):
+							for trailPron in newSyllables[i+1]:
+								for trailTargetPron in oldSyllables[j+1]:
+									if model.sylRhymes(trailPron, trailTargetPron):
+										skip = True
 						break
 				if found: break
-
-			# Cost is proportional to how much you were supposed to rhyme
 			if not found:
-				cost += (prob * rhymeWeight)
-
+				if i is len(newSyllables) - 1: # Last syllable
+					sylCost += ((rhymeDist[i + len(oldSyllables)][j]) * constants.lastSylWeight)
+				else:
+					sylCost += rhymeDist[i + len(oldSyllables)][j]
+		cost += sylCost
 	return cost
-	 
+
 
 class PhraseGenProblem(searchUtil.SearchProblem):
     def __init__(self, startGram, lineLens, costFunction):
@@ -110,6 +122,15 @@ class PhraseGenProblem(searchUtil.SearchProblem):
 
 # ************************************
 
+# Testing
+totalPhrase = ("Butter", "in", "my", "the") # 1 syllable rhyme
+print(costFunction(totalPhrase))
+totalPhrase = ("Butter", "in", "my", "the", "shoe") # no rhyme
+print(costFunction(totalPhrase))
+totalPhrase = ("Butter", "in", "my", "gutter") # 2 syllable rhyme!!
+print(costFunction(totalPhrase))
+
+
 # *********** Solve search problem ******
 
 # Returns a phrase in the form of a list of words
@@ -121,41 +142,48 @@ def solve(startGram, lineLens, costFunction):
 
 # ************************************
 
+
+
+
+
+
+
+
 # ******* Main ******
 
-for style in constants.styleNames:
-	genCorpus(style)
-	generation.loadModel(style)
+# for style in constants.styleNames:
+# 	genCorpus(style)
+# 	generation.loadModel(style)
 
- 	totalLyrics = []
-	# Choose a random starting gram
-	startGram = random.choice(generation.gramDict.keys())
-	print(startGram)
+#  	totalLyrics = []
+# 	# Choose a random starting gram
+# 	startGram = random.choice(generation.gramDict.keys())
+# 	print(startGram)
 
-	# Generate numPhrases phrases
-	for i in range(generation.numPhrases):
-		# -1 represents when we've generated enough lines
-		# lineLens = [generation.sampleLineLength() for i in range(model.phraseLen)]
-		lineLen = generation.sampleLineLength()
-		while lineLen > 12:
-			lineLen = generation.sampleLineLength()
-		lineLens = [lineLen]
-		# lineLens.append(-1)
-		phrase = solve(startGram, lineLens, costFunction)
-		print(phrase)
-		totalLyrics += ' '.join(phrase)
+# 	# Generate numPhrases phrases
+# 	for i in range(generation.numPhrases):
+# 		# -1 represents when we've generated enough lines
+# 		# lineLens = [generation.sampleLineLength() for i in range(model.phraseLen)]
+# 		lineLen = generation.sampleLineLength()
+# 		while lineLen > 12:
+# 			lineLen = generation.sampleLineLength()
+# 		lineLens = [lineLen]
+# 		# lineLens.append(-1)
+# 		phrase = solve(startGram, lineLens, costFunction)
+# 		print(phrase)
+# 		totalLyrics += ' '.join(phrase)
 
-		# Get new startGram (last gram in previously generated phrase)
-		# startGram = generation.getPrevTuple(phrase[:len(phrase)-1])
-		startGram = random.choice(generation.gramDict.keys())
+# 		# Get new startGram (last gram in previously generated phrase)
+# 		# startGram = generation.getPrevTuple(phrase[:len(phrase)-1])
+# 		startGram = random.choice(generation.gramDict.keys())
 
-	print(''.join(totalLyrics))
+# 	print(''.join(totalLyrics))
 
-	# Evaluation
-	distance, fluencyScore = generation.evaluate(style, ' '.join(totalLyrics), True)
-	print("Distance: {}".format(distance))
-	print("Fluency: {}".format(fluencyScore))
-	print("\n")
+# 	# Evaluation
+# 	distance, fluencyScore = generation.evaluate(style, ' '.join(totalLyrics), True)
+# 	print("Distance: {}".format(distance))
+# 	print("Fluency: {}".format(fluencyScore))
+# 	print("\n")
 
-plotter.plot()
+# plotter.plot()
 
