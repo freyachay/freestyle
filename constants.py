@@ -11,7 +11,7 @@ n = 2
 phraseLen = 2
 
 # Number of phrases to generate (used in generation)
-numPhrases = 1
+numPhrases = 5
 
 # How probable must a rhyme be to count as needing to rhyme? (used in generation)
 rhymeThresh = 0.05

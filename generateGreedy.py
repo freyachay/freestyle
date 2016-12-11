@@ -15,7 +15,7 @@ def dd():
 
 # Given a probability distribution, returns a list of samples, one per peak
 # Peaks are demarkated by local minima
-def samplePeaks(distribution):
+def samplePeaks(distribution, rhymePos):
 	minIndices = []
 	items = distribution.keys()
 
@@ -49,7 +49,9 @@ def samplePeaks(distribution):
 			weights.append(subDist[k])
 
 		# Given chunk of distribution, sample from it
-		peakChoices.append(choice(subDist.keys(), p=weights))
+		sample = choice(subDist.keys(), p=weights)
+		if sample not in rhymePos:
+			peakChoices.append(sample)
 	return peakChoices
 
 
@@ -72,19 +74,21 @@ def generate():
 	totalPhraseLength = len(model.getSyllables(currentPhrase))
 
 	for _ in range(numPhrases):
+		print("\n")
 		lineLengths = [generation.sampleLineLength() for i in range(phraseLen)]
 		print(lineLengths)
 
 		# Pick rhyming positions for phrase
 		totalLen = sum(lineLengths)
 		# Add ends of lines
-		rhymePos = [lineLengths[0]]
+		rhymePos = [lineLengths[0] - 1]
 		for i in range(1, len(lineLengths)):
 			rhymePos.append(rhymePos[i-1] + lineLengths[i])
 
 		# Sample additional rhymes (one sample per peak)
 		phraseRhymeDist = rhymeDist[totalLen] # Dictionary
-		rhymePos += samplePeaks(phraseRhymeDist)
+		rhymePos += samplePeaks(phraseRhymeDist, rhymePos)
+		rhymePos = sorted(rhymePos)
 		print(rhymePos)
 
 		for targetLineLength in lineLengths:
@@ -106,6 +110,9 @@ def generate():
 				currentPhrase.append(nextWord)
 				totalPhrase.append(nextWord)
 				currentLineLength += len(model.getSyllables([nextWord]))
+
+				# print("Curr line length = {}".format(currentLineLength))
+
 				currentPhraseLength += len(model.getSyllables([nextWord]))
 				totalPhraseLength += len(model.getSyllables([nextWord]))
 			currentPhrase.append("\n")
@@ -128,6 +135,7 @@ for style in constants.styleNames:
 	print("\n")
 
 plotter.plot()
+
 
 
 

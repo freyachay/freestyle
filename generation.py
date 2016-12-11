@@ -76,13 +76,9 @@ def findRhyme(sylProns):
 
 		# Look rhyming sound up in rhyming dictionary, find a word!
 		rhymingWords = rhymingDictionary[key]
-		validRhymingWords = []
-		for word in rhymingWords:
-			rhymeProns = model.getSyllables(word)[0]
-			if rhymeProns is not sylProns: validRhymingWords.append(word)
 
 		if len(rhymingWords) is not 0:
-			return random.sample(validRhymingWords, 1)[0]
+			return random.sample(rhymingWords, 1)[0]
 
 	# No rhymes found for any pronunciation
 	return ""
