@@ -32,7 +32,7 @@ rhymingDictionary = defaultdict(set)
 
 # Takes a string and returns a list of words, seperated by punctuation (but not apostrophes or dashes)
 def processPhrase(phrase):
-	tokenizer = RegexpTokenizer('[\'\w\-]+')
+	tokenizer = RegexpTokenizer('\w[\w\']*\w|\w')
 	tokens = tokenizer.tokenize(phrase)
 	punct = ['.', ',', '!', ':', ';']
 	words = [word for word in tokens if word not in punct]
@@ -131,8 +131,8 @@ def getSyllables(phrase):
 # Takes in 2 pronunciations of syllables (lists of sounds), returns 
 # whether or not they "rhyme" (rhyming = shared stressed vowel and suffix)
 def sylRhymes(syl1, syl2):
-	# Reject repetition
-	if (syl1 == syl2): return False
+	# # Reject repetition
+	# if (syl1 == syl2): return False
 
 	# Get stressed syllable and suffix from syl1
 	stressed1 = [s for s in syl1 if minusDigit(s) in vowelPhenomes][0] # We know there will only be one stressed syl
@@ -160,11 +160,14 @@ def updateRhymeDistCounts(phraseSylDict):
 						break
 				if found: break
 
-# Normalizes rhymeDist based on number of phrases
-def normalizeRhymeDist(phraseCount):
-	for pos, count in rhymeDist.iteritems():
-		for k, v in count.iteritems():
-			(rhymeDist[pos])[k] = v/phraseCount
+# Normalizes rhymeDist
+def normalizeRhymeDist():
+	for pos, dist in rhymeDist.iteritems():
+		totalCount = 0
+		for index, count in dist.iteritems():
+			totalCount += count
+		for index, count in dist.iteritems():
+			rhymeDist[pos][index] = count/totalCount
 
 # ****************************************************
 
@@ -274,7 +277,7 @@ def buildModel(contents):
 			updateRhymeDistCounts(phraseSylDict)
 			phrase = ''
 	normalizeLineDist(lineCount)
-	normalizeRhymeDist(phraseCount)
+	normalizeRhymeDist()
 	return (rhymeDist, lineLenDist, gramDict, rhymingDictionary)
 
 def pickleFiles(styleName):
@@ -293,8 +296,3 @@ def processStyle(styleName):
 # ### Comment out for importing to generation
 # for styleName in constants.styleNames:
 # 	processStyle(styleName)
-
-
-
-
-

@@ -4,14 +4,14 @@ styleNames = ['Hamilton']
 
 # *********** Greedy
 
-# # For gram model (used in model and generation)
+# For gram model (used in model and generation)
 # n = 2
 
 # # Number of lines per phrase (used in model and generation)
 # phraseLen = 2
 
 # # Number of phrases to generate (used in generation)
-# numPhrases = 5
+# numPhrases = 3
 
 # # How probable must a rhyme be to count as needing to rhyme? (used in generation)
 # rhymeThresh = 0.05
@@ -27,13 +27,10 @@ n = 2
 phraseLen = 1
 
 # Number of phrases to generate (used in generation)
-numPhrases = 2
+numPhrases = 1
 
-# How probable must a rhyme be to count as needing to rhyme? (used in generation)
-rhymeThresh = 0.05 
+# Pruning -- how many of each do we branch?
+pruneFluency = 3
+pruneRhyming = 3
 
-# Constants for generation by search
-rhymeWeight = 10
-pruningConstant = 10
-
-lastSylWeight = 1.5
+lastSylWeight = 3

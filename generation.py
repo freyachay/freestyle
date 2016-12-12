@@ -16,7 +16,6 @@ rhymingDictionary = None
 n = constants.n
 phraseLen = constants.phraseLen
 numPhrases = constants.numPhrases
-rhymeThresh = constants.rhymeThresh
 
 def dd():
 	return defaultdict(float)
