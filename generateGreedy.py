@@ -112,6 +112,8 @@ def generate():
 				currentLineLength += len(model.getSyllables([nextWord]))
 
 				# print("Curr line length = {}".format(currentLineLength))
+				# print("Next word: {}".format(nextWord))
+				# print("\n")
 
 				currentPhraseLength += len(model.getSyllables([nextWord]))
 				totalPhraseLength += len(model.getSyllables([nextWord]))

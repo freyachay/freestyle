@@ -64,6 +64,8 @@ def costFunction(newState):
 					sylCost += rhymeDist[i + len(oldSyllables)][j]
 		# print("Cost: {}".format(sylCost))
 		cost += sylCost
+	print(newState)
+	print("COST: {}".format(cost))
 	return cost
 
 # Takes in a list of words. Returns a list of pruneFluency + pruneRhyming words
@@ -99,7 +101,6 @@ class PhraseGenProblem(searchUtil.SearchProblem):
         return (state[1] == generation.phraseLen)
 
     def succAndCost(self, state):
-    	print(state)
         results = []
         (prevPhrase, prevLineCount, targetLineLen) = state
 
@@ -162,7 +163,6 @@ def solve(startGram, lineLens, costFunction):
 
 
 
-
 # ******* Main ******
 
 for style in constants.styleNames:
@@ -178,13 +178,12 @@ for style in constants.styleNames:
 		# -1 represents when we've generated enough lines
 		# lineLens = [generation.sampleLineLength() for i in range(model.phraseLen)]
 		lineLen = generation.sampleLineLength()
-		while lineLen > 6:
-			lineLen = generation.sampleLineLength()
-		lineLens = [lineLen]
+		# while lineLen > constants.maxLineLen or lineLen is 0:
+		# 	lineLen = generation.sampleLineLength()
+		lineLens = [8]
 		# lineLens.append(-1)
 		phrase = solve(startGram, lineLens, costFunction)
-		print(phrase)
-		totalLyrics += ' '.join(phrase)
+		totalLyrics += (' '.join(list(startGram)) + " " + ' '.join(phrase))
 
 		# Get new startGram (last gram in previously generated phrase)
 		# startGram = generation.getPrevTuple(phrase[:len(phrase)-1])

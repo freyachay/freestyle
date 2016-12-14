@@ -144,7 +144,7 @@ def sylRhymes(syl1, syl2):
 	stressIndex2 = syl2.index(stressed2)
 	suffix2 = syl2[stressIndex2 + 1:]
 
-	return (stressed1 == stressed2) and (suffix1 == suffix2)
+	return (stressed1 == stressed2)
 
 # Counts how many times each position (syllable) rhymes with each previous position in the phrase
 def updateRhymeDistCounts(phraseSylDict):
@@ -293,6 +293,6 @@ def processStyle(styleName):
 	pickleFiles(styleName)
 
 
-# ### Comment out for importing to generation
+### Comment out for importing to generation
 # for styleName in constants.styleNames:
 # 	processStyle(styleName)

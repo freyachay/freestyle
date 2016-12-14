@@ -29,8 +29,10 @@ phraseLen = 1
 # Number of phrases to generate (used in generation)
 numPhrases = 1
 
+maxLineLen = 8
+
 # Pruning -- how many of each do we branch?
-pruneFluency = 3
-pruneRhyming = 3
+pruneFluency = 15
+pruneRhyming = 15
 
 lastSylWeight = 3
