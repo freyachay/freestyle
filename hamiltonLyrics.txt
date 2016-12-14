@@ -62,10 +62,16 @@ I'm Alexander Hamilton, I'm at your service, sir
 I have been looking for you
 I'm getting nervous
 Sir
-I heard your name at Princeton. I was seeking an accelerated course of study when I got sort of out of sorts with a buddy of yours. I may have punched him. It's a blur, sir. He handles the financials?
-You punched the bursar
+I heard your name at Princeton
+I was seeking an accelerated course of study
+when I got sort of out of sorts with a buddy of yours
+I may have punched him. It's a blur, sir.
+He handles the financials?
+You punched the bursar?
 Yes!
-I wanted to do what you did. Graduate in two, then join the revolution. He looked at me like I was stupid, I'm not stupid
+I wanted to do what you did. 
+Graduate in two, then join the revolution. 
+He looked at me like I was stupid, I'm not stupid
 So how'd you do it? How'd you graduate so fast?
 It was my parents' dying wish before they passed
 You're an orphan. Of course! I'm an orphan
@@ -333,7 +339,9 @@ We'll need some spies on the inside
 Some King's men who might let some things slide
 I'll write to Congress and tell ‘em we need supplies, you rally the guys,
 Master the element of surprise
-I'll rise above my station, organize your information, ‘til we rise to the occasion of our new nation
+I'll rise above my station
+Organize your information
+‘Til we rise to the occasion of our new nation
 
 
 
@@ -1037,18 +1045,17 @@ Oh, Alexander Hamilton
 I have soldiers that will yield for you
 If we manage to get this right
 They'll surrender by early light
-The world will never be the same, Alexander…e deniability
+The world will never be the same, Alexander
 
 Duel before the sun is in the sky
 Pick a place to die where it's high and dry
-
 Leave a note for your next of kin
 Tell ‘em where you been. Pray that hell or heaven lets you in
-
-Confess your sins. Ready for the moment of adrenaline when you finally face your opponent
-
+Confess your sins
+Ready for the moment of adrenaline
+When you finally face your opponent
 Your last chance to negotiate
-Send in your seconds, see if they can set the record straight…
+Send in your seconds, see if they can set the record straight
 
 Can we agree that duels are dumb and immature?
 But your man has to answer for his words, Burr
@@ -1068,7 +1075,4 @@ Non-stop!
 Gentlemen of the jury, I'm curious, bear with me
 Are you aware that we're making hist'ry?
 This is the first murder trial of our brand-new nation
-The liberty behind
-Deliberation—                                    
-
-
+The liberty behind deliberation                               
