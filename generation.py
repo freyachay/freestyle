@@ -16,7 +16,6 @@ rhymingDictionary = None
 n = constants.n
 phraseLen = constants.phraseLen
 numPhrases = constants.numPhrases
-rhymeThresh = constants.rhymeThresh
 
 def dd():
 	return defaultdict(float)
@@ -26,17 +25,23 @@ def loadModel(styleName):
 	global gramDict
 	global rhymeDist 
 	global rhymingDictionary
-	lineLenDist = pickle.load(open("lineLenDist" + styleName + "_4.p", "rb"))
-	gramDict = pickle.load(open("gramDict" + styleName + "_4.p", "rb"))
-	rhymeDist = pickle.load(open("rhymeDist" + styleName + "_4.p", "rb"))
-	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + "_4.p", "rb"))
+	lineLenDist = pickle.load(open("lineLenDist" + styleName + "_" + str(phraseLen) + ".p", "rb"))
+	gramDict = pickle.load(open("gramDict" + styleName + "_" + str(phraseLen) + ".p", "rb"))
+	rhymeDist = pickle.load(open("rhymeDist" + styleName + "_" + str(phraseLen) + ".p", "rb"))
+	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + "_" + str(phraseLen) + ".p", "rb"))
 
 # Uses ngram dict to generate next word
 def generateWord(prev):
-	if len(gramDict[prev]) is 0:
-		return ""
-	return random.choice(gramDict[prev])
+	if len(gramDict[prev].keys()) is 0: return ""
 
+	elements = []
+	weights = []
+
+	for k, v in gramDict[prev].iteritems():
+		elements.append(k)
+		weights.append(v)
+
+	return choice(elements, p=weights)
 
 # Returns a number of syllables for a line
 def sampleLineLength():
@@ -70,33 +75,21 @@ def findRhyme(sylProns):
 
 		# Look rhyming sound up in rhyming dictionary, find a word!
 		rhymingWords = rhymingDictionary[key]
-		validRhymingWords = []
-		for word in rhymingWords:
-			rhymeProns = model.getSyllables(word)[0]
-			if rhymeProns is not sylProns: validRhymingWords.append(word)
 
 		if len(rhymingWords) is not 0:
-			return random.sample(validRhymingWords, 1)[0]
+			return random.sample(rhymingWords, 1)[0]
 
 	# No rhymes found for any pronunciation
 	return ""
 
-# Takes in a position, checks rhymeDist, looks for a word that starts with rhyme target (in order of
-# rhyme target probability)
-def sampleRhymeDist(currentPhrase, pos):
-	# Sorted rhyme targets sorted by probability
-	targets = rhymeDist[pos]
-	if len(targets) is 0: return ""
-
-	# Eliminate targets below probability threshold
-	filteredTargets = [i for i in targets.keys() if targets[i] > rhymeThresh]
-
-	sortedTargets = sorted(targets, key=targets.get, reverse = True)
-	finalTargets = [t for t in sortedTargets if t in filteredTargets]
-
+# Takes in a current position to be filled, 
+# looks for a word that rhymes with one of the rhyme targets specified by 
+# position in rhymePos (rhymePos expected to be sorted)
+def getRhymingWord(currentPhrase, pos, rhymePos):
 	phraseSyllables = model.getSyllables(currentPhrase)
-	for target in finalTargets:
-		rhymeWord = findRhyme(phraseSyllables[target])
+	for i in range(rhymePos.index(pos)):
+		targetPos = rhymePos[i]
+		rhymeWord = findRhyme(phraseSyllables[targetPos])
 		if rhymeWord is not "":
 			return rhymeWord
 	return ""
@@ -123,5 +116,20 @@ def evaluate(targetStyle, generatedText, plot):
 			# Plot graph of generated rhyme dist and model rhyme dist at pos
 			plotter.evaluationGraph(targetStyle, genRhymeDist, lineLen)
 
-	return distance
+	# Evaluate fluency
+	fluencyScore = 0
+	for gram in model.generateGrams(generatedText.split()):
+		key = tuple(gram.split()[:n-1])
+		successor = gram.split()[n-1]
+		fluencyScore += gramDict[key][successor]
+
+	return (distance, fluencyScore/len(generatedText.split()))
+
+
+
+
+
+
+
+
 		

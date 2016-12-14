@@ -25,14 +25,14 @@ def dd():
 
 rhymeDist = defaultdict(dd)
 lineLenDist = defaultdict(float)
-gramDict = defaultdict(list)
+gramDict = defaultdict(dd)
 rhymingDictionary = defaultdict(set)
 
 # ************* Helpers ***********
 
 # Takes a string and returns a list of words, seperated by punctuation (but not apostrophes or dashes)
 def processPhrase(phrase):
-	tokenizer = RegexpTokenizer('[\'\w\-]+')
+	tokenizer = RegexpTokenizer('\w[\w\']*\w|\w')
 	tokens = tokenizer.tokenize(phrase)
 	punct = ['.', ',', '!', ':', ';']
 	words = [word for word in tokens if word not in punct]
@@ -131,8 +131,8 @@ def getSyllables(phrase):
 # Takes in 2 pronunciations of syllables (lists of sounds), returns 
 # whether or not they "rhyme" (rhyming = shared stressed vowel and suffix)
 def sylRhymes(syl1, syl2):
-	# Reject repetition
-	if (syl1 == syl2): return False
+	# # Reject repetition
+	# if (syl1 == syl2): return False
 
 	# Get stressed syllable and suffix from syl1
 	stressed1 = [s for s in syl1 if minusDigit(s) in vowelPhenomes][0] # We know there will only be one stressed syl
@@ -144,7 +144,7 @@ def sylRhymes(syl1, syl2):
 	stressIndex2 = syl2.index(stressed2)
 	suffix2 = syl2[stressIndex2 + 1:]
 
-	return (stressed1 == stressed2) and (suffix1 == suffix2)
+	return (stressed1 == stressed2)
 
 # Counts how many times each position (syllable) rhymes with each previous position in the phrase
 def updateRhymeDistCounts(phraseSylDict):
@@ -160,11 +160,14 @@ def updateRhymeDistCounts(phraseSylDict):
 						break
 				if found: break
 
-# Normalizes rhymeDist based on number of phrases
-def normalizeRhymeDist(phraseCount):
-	for pos, count in rhymeDist.iteritems():
-		for k, v in count.iteritems():
-			(rhymeDist[pos])[k] = v/phraseCount
+# Normalizes rhymeDist
+def normalizeRhymeDist():
+	for pos, dist in rhymeDist.iteritems():
+		totalCount = 0
+		for index, count in dist.iteritems():
+			totalCount += count
+		for index, count in dist.iteritems():
+			rhymeDist[pos][index] = count/totalCount
 
 # ****************************************************
 
@@ -192,7 +195,7 @@ def normalizeLineDist(lineCount):
 # ***** N-grams ******
 
 # Takes in a list of words, returns a list of n-grams
-def generate_grams(words):
+def generateGrams(words):
     gramList = []
     for ngram in ngrams(words, n):
         gramList.append(' '.join(str(i) for i in ngram))
@@ -200,14 +203,25 @@ def generate_grams(words):
 
 # Creates list of n-grams from text (contents), updates dictionary mapping n-grams to successor words
 def buildGramDict(contents):
-	grams = generate_grams(processPhrase(contents))
+	grams = generateGrams(processPhrase(contents))
 	for gram in grams:
 		words = gram.split()
 		key = ()
 		for i in range(n-1):
 			key = key + (words[i],)
 
-		gramDict[key].append(words[n-1])
+		value = gramDict[key] # Dictionary mapping successors --> probabability
+		successor = words[n-1]
+		value[successor] += 1
+		gramDict[key] = value
+
+	# Normalize
+	for gram, succDict in gramDict.iteritems():
+		totalCount = 0
+		for word, count in succDict.iteritems():
+			totalCount += count
+		for word, count in succDict.iteritems():
+			gramDict[gram][word] = count/totalCount
 
 # ************************
 
@@ -263,7 +277,7 @@ def buildModel(contents):
 			updateRhymeDistCounts(phraseSylDict)
 			phrase = ''
 	normalizeLineDist(lineCount)
-	normalizeRhymeDist(phraseCount)
+	normalizeRhymeDist()
 	return (rhymeDist, lineLenDist, gramDict, rhymingDictionary)
 
 def pickleFiles(styleName):
@@ -279,6 +293,7 @@ def processStyle(styleName):
 	pickleFiles(styleName)
 
 
+<<<<<<< HEAD
 # ### Comment out for importing to generation
 for styleName in constants.styleNames:
 	processStyle(styleName)
@@ -287,3 +302,8 @@ for styleName in constants.styleNames:
 
 
 
+=======
+### Comment out for importing to generation
+# for styleName in constants.styleNames:
+# 	processStyle(styleName)
+>>>>>>> 7516ec9bab6b32d3b25d8042a10b05dee1a4dffe
