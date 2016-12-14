@@ -166,6 +166,8 @@ def solve(startGram, lineLens, costFunction):
 # ******* Main ******
 
 for style in constants.styleNames:
+	print(generation.gramDict)
+
 	genCorpus(style)
 	generation.loadModel(style)
 

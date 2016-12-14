@@ -13,9 +13,6 @@ styleNames = ['Hamilton']
 # # Number of phrases to generate (used in generation)
 # numPhrases = 3
 
-# # How probable must a rhyme be to count as needing to rhyme? (used in generation)
-# rhymeThresh = 0.05
-
 
 
 # ********** Search
@@ -32,7 +29,7 @@ numPhrases = 1
 maxLineLen = 8
 
 # Pruning -- how many of each do we branch?
-pruneFluency = 15
-pruneRhyming = 15
+pruneFluency = 5
+pruneRhyming = 5
 
 lastSylWeight = 3
