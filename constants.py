@@ -5,6 +5,7 @@ styleNames = ['Hamilton']
 # *********** Greedy
 
 # For gram model (used in model and generation)
+
 # n = 2
 
 # # Number of lines per phrase (used in model and generation)
