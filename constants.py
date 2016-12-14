@@ -24,7 +24,7 @@ n = 2
 phraseLen = 1
 
 # Number of phrases to generate (used in generation)
-numPhrases = 8
+numPhrases = 1
 
 maxLineLen = 8
 
