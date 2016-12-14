@@ -169,7 +169,7 @@ for style in constants.styleNames:
 	genCorpus(style)
 	generation.loadModel(style)
 
- 	totalLyrics = []
+ 	totalLyrics = ""
 	# Choose a random starting gram
 	startGram = random.choice(generation.gramDict.keys())
 
@@ -189,10 +189,10 @@ for style in constants.styleNames:
 		# startGram = generation.getPrevTuple(phrase[:len(phrase)-1])
 		startGram = random.choice(generation.gramDict.keys())
 
-	print(''.join(totalLyrics))
+	print(totalLyrics)
 
 	# Evaluation
-	distance, fluencyScore = generation.evaluate(style, ' '.join(totalLyrics), False)
+	distance, fluencyScore = generation.evaluate(style, totalLyrics, False)
 	print("Distance: {}".format(distance))
 	print("Fluency: {}".format(fluencyScore))
 	print("\n")

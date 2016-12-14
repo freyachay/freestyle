@@ -118,6 +118,7 @@ def evaluate(targetStyle, generatedText, plot):
 
 	# Evaluate fluency
 	fluencyScore = 0
+
 	for gram in model.generateGrams(generatedText.split()):
 		key = tuple(gram.split()[:n-1])
 		successor = gram.split()[n-1]
