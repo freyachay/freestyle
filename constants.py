@@ -8,7 +8,7 @@ styleNames = ['Hamilton']
 n = 2
 
 # Number of lines per phrase (used in model and generation)
-phraseLen = 2
+phraseLen = 4
 
 # Number of phrases to generate (used in generation)
 numPhrases = 2
