@@ -4,7 +4,7 @@ styleNames = ['Hamilton']
 
 # *********** Greedy
 
-# For gram model (used in model and generation)
+# # For gram model (used in model and generation)
 
 # n = 2
 
@@ -25,7 +25,7 @@ n = 2
 phraseLen = 1
 
 # Number of phrases to generate (used in generation)
-numPhrases = 8
+numPhrases = 1
 
 maxLineLen = 8
 
