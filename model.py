@@ -293,17 +293,7 @@ def processStyle(styleName):
 	pickleFiles(styleName)
 
 
-<<<<<<< HEAD
 # ### Comment out for importing to generation
-for styleName in constants.styleNames:
-	processStyle(styleName)
-
-
-
-
-
-=======
-### Comment out for importing to generation
 # for styleName in constants.styleNames:
 # 	processStyle(styleName)
->>>>>>> 7516ec9bab6b32d3b25d8042a10b05dee1a4dffe
+
