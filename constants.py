@@ -1,6 +1,8 @@
 
 styleNames = ['Hamilton']
 
+model = False
+plot = False
 
 # *********** Greedy
 
@@ -8,7 +10,7 @@ styleNames = ['Hamilton']
 n = 2
 
 # Number of lines per phrase (used in model and generation)
-phraseLen = 4
+phraseLen = 2
 
 # Number of phrases to generate (used in generation)
 numPhrases = 2
