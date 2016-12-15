@@ -1,6 +1,8 @@
 
 styleNames = ['Hamilton']
 
+model = False
+plot = False
 
 # *********** Greedy
 

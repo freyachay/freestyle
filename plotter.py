@@ -1,3 +1,4 @@
+import constants
 import pickle
 import matplotlib.pyplot as plt
 from collections import defaultdict
@@ -9,6 +10,7 @@ gramDict = None
 rhymeDist = None 
 rhymingDictionary = None
 styleName = None
+phraseLen = None
 
 def dd():
 	return defaultdict(float)
@@ -18,12 +20,12 @@ def loadModel(style):
 	global gramDict
 	global rhymeDist 
 	global rhymingDictionary
-	global styleName
-	styleName = style
-	lineLenDist = pickle.load(open("lineLenDist" + styleName + "_2.p", "rb"))
-	gramDict = pickle.load(open("gramDict" + styleName + "_2.p", "rb"))
-	rhymeDist = pickle.load(open("rhymeDist" + styleName + "_2.p", "rb"))
-	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + "_2.p", "rb"))
+	global phraseLen
+	phraseLen = constants.phraseLen
+	lineLenDist = pickle.load(open("lineLenDist" + styleName + "_"+ str(phraseLen) + ".p", "rb"))
+	gramDict = pickle.load(open("gramDict" + styleName + "_" + str(phraseLen) + ".p", "rb"))
+	rhymeDist = pickle.load(open("rhymeDist" + styleName + "_" + str(phraseLen) + ".p", "rb"))
+	rhymingDictionary = pickle.load(open("rhymingDictionary" + styleName + "_" + str(phraseLen) + ".p", "rb"))
 
 # Generate Line Length Distribution graph
 def lineLenDistGraph(style):
@@ -66,9 +68,10 @@ def evaluationGraph(targetStyle, genRhymeDist, rhymePos):
 def plot():
 	plt.show()
 
-styleName = "Chance"
-loadModel(styleName)
-lineLenDistGraph(styleName)
-for i in range(5, 8):
-	rhymeDistGraph(rhymeDist, i)
-plot()
+if constants.plot:
+	for styleName in constants.styleNames:
+		loadModel(styleName)
+		lineLenDistGraph(styleName)
+		for i in range(5, 20):
+			rhymeDistGraph(rhymeDist, i)
+		plot()
