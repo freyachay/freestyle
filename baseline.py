@@ -42,32 +42,42 @@ def generate_word(key):
 
 loadModel(styleName)
 
-prevChunk = random.choice(gramDict.keys())
-sentence = [prevChunk[i] for i in range(n-1)]
+rhymeScores = []
+fluencyScores = []
 
-lineCount = 0
-currentLength = 0
-targetLength = random.randrange(5, 12)
-while lineCount < 50:
-	nextWord = generate_word(prevChunk)
-	while(nextWord is ""):
-		nextWord = generate_word(random.choice(gramDict.keys()))
-		
-	sentence.append(nextWord)
-	currentLength += 1
-	prevChunk = prevChunk[1:] + (nextWord,)
-	if currentLength is targetLength:
-		lineCount += 1
-		sentence.append("\n")
-		targetLength = random.randrange(5, 12)
-		currentLength = 0
+for i in range(10):
+	prevChunk = random.choice(gramDict.keys())
+	sentence = [prevChunk[i] for i in range(n-1)]
 
-generatedText = ' '.join(sentence).lower()
-print(generatedText)
-print("")
+	lineCount = 0
+	currentLength = 0
+	targetLength = random.randrange(5, 12)
+	while lineCount < 50:
+		nextWord = generate_word(prevChunk)
+		while(nextWord is ""):
+			nextWord = generate_word(random.choice(gramDict.keys()))
+			
+		sentence.append(nextWord)
+		currentLength += 1
+		prevChunk = prevChunk[1:] + (nextWord,)
+		if currentLength is targetLength:
+			lineCount += 1
+			sentence.append("\n")
+			targetLength = random.randrange(5, 12)
+			currentLength = 0
 
-distance, fluencyScore = generation.evaluate(styleName, generatedText, False)
-print("Distance: {}".format(distance))
-print("Fluency: {}".format(fluencyScore))
+	generatedText = ' '.join(sentence).lower()
+
+	rhymeScore, fluencyScore = generation.evaluate(styleName, generatedText, False)
+
+	# Store scores
+	rhymeScores.append(rhymeScore)
+	fluencyScores.append(fluencyScore)
+
+def average(l):
+	return float(sum(l))/len(l)
+
+print("Average Rhyme score: {}".format(average(rhymeScores)))
+print("Average Fluency score: {}".format(average(fluencyScores)))
 print("\n")
 	

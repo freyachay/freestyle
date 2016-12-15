@@ -1,5 +1,5 @@
 
-styleNames = ['Chance']
+styleNames = ['Hamilton']
 
 model = False
 plot = False
@@ -13,7 +13,7 @@ n = 2
 phraseLen = 2
 
 # Number of phrases to generate (used in generation)
-numPhrases = 2
+numPhrases = 25
 
 
 

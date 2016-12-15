@@ -5,6 +5,7 @@ import plotter
 import constants
 from numpy.random import choice
 from collections import defaultdict
+from collections import Counter
 
 # Model global variables
 lineLenDist = None
@@ -102,22 +103,12 @@ def evaluate(targetStyle, generatedText, plot):
 	# Create genModel: i.e. the model of our generated text
 	(genRhymeDist, _, _, _) = model.buildModel(generatedText)
 
-	distance = 0
-	# Iterate through every postition that appears in model 
-	for pos, targetDist in rhymeDist.iteritems():
-		genDist = genRhymeDist[pos]
-		keySuperSet = set(targetDist.keys()).union(set(genDist.keys()))
-		for key in keySuperSet:
-			distance += (targetDist[key] - genDist[key])**2
-
 	numRhymes = 0
 
 	lines = generatedText.splitlines()
 	numPhrases = len(lines)/phraseLen
 	print(numPhrases)
 	for i in range(numPhrases): # For each phrase
-		print(numRhymes)
-		print('')
 		phrase = [lines[j] for j in range(2*i, (2*i) + phraseLen)]
 
 		phraseWords = []
@@ -132,31 +123,28 @@ def evaluate(targetStyle, generatedText, plot):
 				found = False
 				syl1 = phraseSyls[x]
 				syl2 = phraseSyls[y]
-				for pron1 in syl1:
-					for pron2 in syl2:
-						if model.sylRhymes(pron1, pron2):
 
-							# *********** NOT USING MODEL.SYLRHYMES
-							# Instead we need to score the rhyme in terms of quality
-							# Same thing as UCS
-							# Basically:
-							# - Rhyming at ends of words is great
-							# - Multi syllable rhymes are great
-							# - Single syllable full rhyme is good
-							# - Slant rhymes are EHHHHHH
-							# - Not rhyming is zero
+				def existsRhymeCombo(syl1, syl2):
+					for pron1 in syl1:
+						for pron2 in syl2:
+							if model.sylRhymes(pron1, pron2): return True
+					return False
 
+				if existsRhymeCombo(syl1, syl2):
+					xTemp = x
+					yTemp = y
+					consecCount = 0
+					consecDict = defaultdict(int)
+					while existsRhymeCombo(phraseSyls[xTemp], phraseSyls[yTemp]):
+						consecCount += 1
+						numRhymes += 1
+						xTemp += 1
+						yTemp += 1
+						if xTemp > len(phraseSyls)-1 or yTemp > x: break
+					value = consecDict[consecCount]
+					consecDict[consecCount] = value + 1
 
-
-							print("{}, {}".format(syl1, syl2))
-							numRhymes += 1
-							found = True
-							break
-					if found: break
-				
-	
-	numRhymes = float(numRhymes)/numPhrases
-	print("Num rhymes: {}".format(numRhymes))
+	rhymeScore = float(numRhymes)/numPhrases
 
 	# numSamples = 2
 	if plot:
@@ -173,7 +161,7 @@ def evaluate(targetStyle, generatedText, plot):
 		successor = gram.split()[n-1]
 		fluencyScore += gramDict[key][successor]
 
-	return (distance, fluencyScore/len(generatedText.split()))
+	return (rhymeScore, fluencyScore/len(generatedText.split()))
 
 
 

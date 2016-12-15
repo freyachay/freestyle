@@ -192,9 +192,9 @@ for style in constants.styleNames:
 	print(totalLyrics)
 
 	# Evaluation
-	distance, fluencyScore = generation.evaluate(style, totalLyrics, False)
-	print("Distance: {}".format(distance))
-	print("Fluency: {}".format(fluencyScore))
+	rhymeScore, fluencyScore = generation.evaluate(style, totalLyrics, False)
+	print("Rhyme score: {}".format(rhymeScore))
+	print("Fluency score: {}".format(fluencyScore))
 	print("\n")
 
 plotter.plot()

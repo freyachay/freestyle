@@ -74,9 +74,7 @@ def generate():
 	totalPhraseLength = len(model.getSyllables(currentPhrase))
 
 	for _ in range(numPhrases):
-		print("\n")
 		lineLengths = [generation.sampleLineLength() for i in range(phraseLen)]
-		print(lineLengths)
 
 		# Pick rhyming positions for phrase
 		totalLen = sum(lineLengths)
@@ -89,7 +87,6 @@ def generate():
 		phraseRhymeDist = rhymeDist[totalLen] # Dictionary
 		rhymePos += samplePeaks(phraseRhymeDist, rhymePos)
 		rhymePos = sorted(rhymePos)
-		print(rhymePos)
 
 		for targetLineLength in lineLengths:
 			# Generate line
@@ -131,11 +128,10 @@ for style in constants.styleNames:
 	generation.loadModel(style)
 	generatedText = generate()
 	print(generatedText)
-	distance, fluencyScore = generation.evaluate(style, generatedText, False)
-	print("Distance: {}".format(distance))
+	rhymeScore, fluencyScore = generation.evaluate(style, generatedText, False)
+	print("Rhyme score: {}".format(rhymeScore))
 	print("Fluency: {}".format(fluencyScore))
 	print("\n")
-
 plotter.plot()
 
 
