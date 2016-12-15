@@ -3,7 +3,6 @@ import pickle
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
-
 # Model global variables
 lineLenDist = None
 gramDict = None
