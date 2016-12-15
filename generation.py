@@ -98,6 +98,7 @@ def getRhymingWord(currentPhrase, pos, rhymePos):
 # and returns the distance squared between the rhyme distribution of the 
 # generated model and target model 
 def evaluate(targetStyle, generatedText, plot):
+	loadModel(targetStyle)
 	# Create genModel: i.e. the model of our generated text
 	(genRhymeDist, _, _, _) = model.buildModel(generatedText)
 
@@ -108,6 +109,54 @@ def evaluate(targetStyle, generatedText, plot):
 		keySuperSet = set(targetDist.keys()).union(set(genDist.keys()))
 		for key in keySuperSet:
 			distance += (targetDist[key] - genDist[key])**2
+
+	numRhymes = 0
+
+	lines = generatedText.splitlines()
+	numPhrases = len(lines)/phraseLen
+	print(numPhrases)
+	for i in range(numPhrases): # For each phrase
+		print(numRhymes)
+		print('')
+		phrase = [lines[j] for j in range(2*i, (2*i) + phraseLen)]
+
+		phraseWords = []
+		for line in phrase:
+			for word in line.split():
+				phraseWords.append(word)
+
+		
+		phraseSyls = model.getSyllables(phraseWords)
+		for x in range(len(phraseSyls)):
+			for y in range(x):
+				found = False
+				syl1 = phraseSyls[x]
+				syl2 = phraseSyls[y]
+				for pron1 in syl1:
+					for pron2 in syl2:
+						if model.sylRhymes(pron1, pron2):
+
+							# *********** NOT USING MODEL.SYLRHYMES
+							# Instead we need to score the rhyme in terms of quality
+							# Same thing as UCS
+							# Basically:
+							# - Rhyming at ends of words is great
+							# - Multi syllable rhymes are great
+							# - Single syllable full rhyme is good
+							# - Slant rhymes are EHHHHHH
+							# - Not rhyming is zero
+
+
+
+							print("{}, {}".format(syl1, syl2))
+							numRhymes += 1
+							found = True
+							break
+					if found: break
+				
+	
+	numRhymes = float(numRhymes)/numPhrases
+	print("Num rhymes: {}".format(numRhymes))
 
 	# numSamples = 2
 	if plot:

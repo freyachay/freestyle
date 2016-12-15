@@ -1,59 +1,74 @@
+
 import nltk
 import random
 import collections
+import pickle
+import constants
+import generation
+from numpy.random import choice
 from nltk.util import ngrams
 from collections import Counter
+from collections import defaultdict
 
-def generate_grams(words, n):
-    gramList = []
-    
-    for ngram in ngrams(words, n):
-        gramList.append(' '.join(str(i) for i in ngram))
-    return gramList
+# Model global variables
+styleName = "Hamilton"
+gramDict = None
+phraseLen = None
+n = None
 
-def create_dict(grams, n):
-	gramDict = collections.defaultdict(list)
-	for gram in grams:
-		words = gram.split()
+def dd():
+	return defaultdict(float)
 
-		key = ()
-		for i in range(n-1):
-			key = key + (words[i],)
+def loadModel(style):
+	global gramDict
+	global phraseLen
+	global n
+	n = constants.n
+	phraseLen = constants.phraseLen
+	gramDict = pickle.load(open("gramDict" + styleName + "_" + str(phraseLen) + ".p", "rb"))
 
-		gramDict[key].append(words[n-1])
-	return gramDict
 
-def generate_word(key, gramDict, words):
+def generate_word(key):
 	if len(gramDict[key]) is 0:
 		return ""
-	return random.choice(gramDict[key])
 
-n = 2
-f = open('chanceLyrics.txt')
-contents = f.read()
+	elements = []
+	weights = []
+	for succ, prob in gramDict[key].iteritems():
+		elements.append(succ)
+		weights.append(prob)
 
-grams = generate_grams(contents.split(' '), n)
-freqTable = Counter(grams)
+	return choice(elements, p=weights)
 
-gramDict = create_dict(grams, n)
+
+loadModel(styleName)
 
 prevChunk = random.choice(gramDict.keys())
 sentence = [prevChunk[i] for i in range(n-1)]
 
 currentLength = 0
 targetLength = random.randrange(5, 12)
-for i in range(100):
-	nextWord = generate_word(prevChunk, gramDict, contents.split())
+lineCounter = 0
+while lineCounter < 50:
+	nextWord = generate_word(prevChunk)
 	while(nextWord is ""):
-		nextWord = generate_word(random.choice(gramDict.keys()), gramDict, contents.split())
-	
+		nextWord = generate_word(random.choice(gramDict.keys()))
+		
 	sentence.append(nextWord)
 	currentLength += 1
 	prevChunk = prevChunk[1:] + (nextWord,)
 	if currentLength is targetLength:
 		sentence.append("\n")
+		lineCounter += 1
 		targetLength = random.randrange(5, 12)
 		currentLength = 0
-print(' '.join(sentence).lower())
-	
+
+generatedText = ' '.join(sentence).lower()
+print(generatedText)
+print("")
+
+distance, fluencyScore = generation.evaluate(styleName, generatedText, False)
+print("Distance: {}".format(distance))
+print("Fluency: {}".format(fluencyScore))
+print("\n")
 	
