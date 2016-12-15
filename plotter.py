@@ -65,9 +65,10 @@ def evaluationGraph(targetStyle, genRhymeDist, rhymePos):
 def plot():
 	plt.show()
 
-styleName = "Chance"
-loadModel(styleName)
-lineLenDistGraph(styleName)
-for i in range(5, 8):
-	rhymeDistGraph(rhymeDist, i)
-plot()
+# # Comment out when running generate
+# styleName = "Chance"
+# loadModel(styleName)
+# lineLenDistGraph(styleName)
+# for i in range(5, 8):
+# 	rhymeDistGraph(rhymeDist, i)
+# plot()

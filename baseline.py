@@ -29,10 +29,11 @@ def generate_word(key, gramDict, words):
 	return random.choice(gramDict[key])
 
 n = 2
-f = open('chanceLyrics.txt')
+f = open('hamiltonLyrics.txt')
 contents = f.read()
 
 grams = generate_grams(contents.split(' '), n)
+print(grams)
 freqTable = Counter(grams)
 
 gramDict = create_dict(grams, n)
@@ -40,9 +41,10 @@ gramDict = create_dict(grams, n)
 prevChunk = random.choice(gramDict.keys())
 sentence = [prevChunk[i] for i in range(n-1)]
 
+lineCount = 0
 currentLength = 0
 targetLength = random.randrange(5, 12)
-for i in range(100):
+while(lineCount < 50):
 	nextWord = generate_word(prevChunk, gramDict, contents.split())
 	while(nextWord is ""):
 		nextWord = generate_word(random.choice(gramDict.keys()), gramDict, contents.split())
@@ -51,6 +53,7 @@ for i in range(100):
 	currentLength += 1
 	prevChunk = prevChunk[1:] + (nextWord,)
 	if currentLength is targetLength:
+		lineCount += 1
 		sentence.append("\n")
 		targetLength = random.randrange(5, 12)
 		currentLength = 0
