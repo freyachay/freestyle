@@ -31,7 +31,6 @@ def loadModel(style):
 def generate_word(key):
 	if len(gramDict[key]) is 0:
 		return ""
-
 	elements = []
 	weights = []
 	for succ, prob in gramDict[key].iteritems():
@@ -46,10 +45,10 @@ loadModel(styleName)
 prevChunk = random.choice(gramDict.keys())
 sentence = [prevChunk[i] for i in range(n-1)]
 
+lineCount = 0
 currentLength = 0
 targetLength = random.randrange(5, 12)
-lineCounter = 0
-while lineCounter < 50:
+while lineCount < 50:
 	nextWord = generate_word(prevChunk)
 	while(nextWord is ""):
 		nextWord = generate_word(random.choice(gramDict.keys()))
@@ -58,8 +57,8 @@ while lineCounter < 50:
 	currentLength += 1
 	prevChunk = prevChunk[1:] + (nextWord,)
 	if currentLength is targetLength:
+		lineCount += 1
 		sentence.append("\n")
-		lineCounter += 1
 		targetLength = random.randrange(5, 12)
 		currentLength = 0
 
